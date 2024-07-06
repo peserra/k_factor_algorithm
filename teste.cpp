@@ -23,11 +23,13 @@ int busca_binaria(std::vector<int> &vetor_ordenado, int valor_buscado) {
     return -1;
 }
 int mapeia_numero(std::vector<int> &vetor_ordenado, int numero) {
-    int numero_retorno = 999;
+    int numero_retorno = 0;
     for(int n : vetor_ordenado) {
-        if (numero > n) {
+        if(n == numero) {
+            numero_retorno = numero;
+        }
+        if (n < numero) {
             numero_retorno = n;
-
         }
     }
     return numero_retorno;
@@ -63,7 +65,7 @@ int main() {
         soma_vizinhanca += adjacencias[i].size();
         intervalos_busca.push_back(indice_conversao); 
     } 
-    int indice = encontra_indice(intervalos_busca, 20); 
+    int indice = encontra_indice(intervalos_busca, 7); 
     std::cout<< indice << std::endl;
 }
 
