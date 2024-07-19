@@ -3,6 +3,13 @@
 #include <algorithm>
 #include <math.h>
 
+struct Grafo {
+    //lista adjacencias
+    // num vertices
+    // num arestas
+    // lista de graus
+};
+
 int busca_binaria(std::vector<int> &vetor_ordenado, int valor_buscado) {
 
     int esq = 0;
@@ -14,7 +21,8 @@ int busca_binaria(std::vector<int> &vetor_ordenado, int valor_buscado) {
         
         if(vetor_ordenado[meio] == valor_buscado) {
             return meio;
-        } else if(vetor_ordenado[meio] < valor_buscado) {
+        }
+        else if(vetor_ordenado[meio] < valor_buscado) {
             esq = meio + 1;
         } else {
             dir = meio - 1;
@@ -22,25 +30,37 @@ int busca_binaria(std::vector<int> &vetor_ordenado, int valor_buscado) {
     }
     return -1;
 }
-int mapeia_numero(std::vector<int> &vetor_ordenado, int numero) {
-    int numero_retorno = 0;
-    for(int n : vetor_ordenado) {
-        if(n == numero) {
-            numero_retorno = numero;
-        }
-        if (n < numero) {
-            numero_retorno = n;
+
+
+int busca_binaria_alterada(std::vector<int> &vetor_ordenado, int valor_buscado) {
+
+    int esq = 0;
+    int dir = vetor_ordenado.size() - 1;
+    int indice_retorno = -1;
+    
+    while(esq <= dir) {
+
+        int meio = floor((double)(esq + dir) / 2);
+        
+        if(vetor_ordenado[meio] <= valor_buscado) {
+            indice_retorno = meio;
+            esq = meio + 1;
+        } else {
+            dir = meio - 1;
         }
     }
-    return numero_retorno;
+    return indice_retorno;
 }
+
+void adiciona_aresta(){}
+
+void cria_grafo(){}
+
 int encontra_indice(std::vector<int> &vetor_ordenado, int numero) {
-    int numero_mapeado = mapeia_numero(vetor_ordenado, numero);
     if((int)vetor_ordenado.size() == 0) {
         return -1;
     }
-
-    return busca_binaria(vetor_ordenado, numero_mapeado);    
+    return busca_binaria_alterada(vetor_ordenado, numero);    
 }
 
 int main() {
@@ -51,7 +71,8 @@ int main() {
     int soma_vizinhanca = 0;
     int k = 2;
     int indice_conversao;
-
+    //acumulador grau
+    // conversor de indices de G -> G' 
     // grafo da folha teste
     grafo_adjacencias.push_back(std::vector<int>{1, 2});              // 0 1 2 3
     grafo_adjacencias.push_back(std::vector<int>{0, 2, 3});           // 4 5 6 7 8 
@@ -68,16 +89,19 @@ int main() {
         soma_vizinhanca += grafo_adjacencias[i].size();
         intervalos_busca.push_back(indice_conversao);
         
-        //criar G'
+        //criar vertices de G'
         std::vector<int> vertice_linha = {}; 
 
-        for (int i = 0; i < (int)grafo_adjacencias[i].size() + k - 1; i++){
-            vertice_linha.push_back(i + indice_conversao);
-            std::cout << i + indice_conversao << " " << std::ends;
+        //std::cout << indice_conversao << std::endl;
+        for (int i = indice_conversao; i < indice_conversao + (int)grafo_adjacencias[i].size() + k - 1; i++){
+            vertice_linha.push_back(i);
+            //std::cout << i  << " " << std::ends;
         } 
         grafo_linha_adjacencias.push_back(vertice_linha);
-        std::cout << '\n' << std::ends;
+        //std::cout << '\n' << std::ends;
     }
+
+    std::vector<std::vector<int>> g_linha = cria_grafo_inflado(grafo);
 
 }
 
