@@ -15,10 +15,15 @@ typedef struct Grafo {
     int numero_arestas = 0;
 } Grafo;
 
+typedef struct K_Fator{
+    std::vector<Aresta> lista_de_arestas;   
+} K_Fator;
+
 typedef struct Aresta {
     int u = 0;
     int v = 0;
 } Aresta;
+
 
 std::vector<int> TABELA_INTERVALOS_BUSCA;
 
@@ -102,6 +107,10 @@ Grafo cria_grafo_inflado(Grafo g, int k) {
     }
 }
 
+K_Fator computa_k_fator_simples(Grafo &grafo) {
+    return;
+}
+
 int main() {
 
     // le entrada para montar o grafo
@@ -127,13 +136,8 @@ int main() {
     
 
     // algoritmo pra encontrar o k fator
-
-
-
-
-
-
-
+    K_Fator f;
+    f = computa_k_fator_simples(grafo);
 
 
 
