@@ -13,17 +13,18 @@ typedef struct Grafo {
     std::vector<int> graus_vertices = {};
     int numero_vertices = 0;
     int numero_arestas = 0;
+    int menor_grau = 9999;
 } Grafo;
 
-typedef struct K_Fator{
-    std::vector<Aresta> lista_de_arestas;   
-} K_Fator;
 
 typedef struct Aresta {
     int u = 0;
     int v = 0;
 } Aresta;
 
+typedef struct K_Fator{
+    std::vector<Aresta> lista_de_arestas;   
+} K_Fator;
 
 std::vector<int> TABELA_INTERVALOS_BUSCA;
 
@@ -107,9 +108,10 @@ Grafo cria_grafo_inflado(Grafo g, int k) {
     }
 }
 
+/*
 K_Fator computa_k_fator_simples(Grafo &grafo) {
     return;
-}
+}*/
 
 int main() {
 
@@ -120,6 +122,7 @@ int main() {
     std::cin.ignore();
     Grafo grafo = cria_grafo(numero_vertices);
 
+    // leitura das linhas do terminal para criar as arestas
     while (getline(std::cin,linha)){
         if(linha.empty())
             break;
@@ -130,14 +133,24 @@ int main() {
 
         adiciona_aresta(grafo, aresta);
     }
-    std::cout << "Numero de arestas de G: " << grafo.numero_arestas << std::endl;
-    std::cout << "Numero de vértices de G: " << grafo.numero_vertices << std::endl;
+
+    for(auto adjacencia : grafo.adjacencias){
+        int grau_vertice = (int)adjacencia.size();
+        grafo.graus_vertices.push_back(grau_vertice);
+        
+        if(grau_vertice < grafo.menor_grau)
+            grafo.menor_grau = grau_vertice;
+        
+    }
+
+    std::cout << "Menor grau de G: " << grafo.menor_grau << std::endl;
+    // std::cout << "Numero de vértices de G: " << grafo.numero_vertices << std::endl;
 
     
 
     // algoritmo pra encontrar o k fator
     K_Fator f;
-    f = computa_k_fator_simples(grafo);
+    //f = computa_k_fator_simples(grafo);
 
 
 
