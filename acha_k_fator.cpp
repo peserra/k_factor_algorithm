@@ -6,8 +6,6 @@
 
 #define toDigit(c) (c-'0')
 
-
-
 typedef struct Grafo {
     std::vector<std::vector<int>> adjacencias = {};
     std::vector<int> graus_vertices = {};
@@ -22,9 +20,9 @@ typedef struct Aresta {
     int v = 0;
 } Aresta;
 
-typedef struct K_Fator{
-    std::vector<Aresta> lista_de_arestas;   
-} K_Fator;
+// typedef struct K_Fator{
+//     std::vector<Aresta> lista_de_arestas;   
+// } K_Fator;
 
 std::vector<int> TABELA_INTERVALOS_BUSCA;
 
@@ -70,12 +68,6 @@ int busca_binaria_alterada(std::vector<int> &vetor_ordenado, int valor_buscado) 
     return indice_retorno;
 }
 
-void adiciona_aresta(Grafo &grafo, Aresta &aresta){
-    grafo.adjacencias[aresta.u].push_back(aresta.v);
-    grafo.adjacencias[aresta.v].push_back(aresta.u);
-    grafo.numero_arestas ++;
-}
-
 Grafo cria_grafo(int numero_vertices){
     Grafo novo_grafo;
 
@@ -88,6 +80,22 @@ Grafo cria_grafo(int numero_vertices){
     return novo_grafo;
 }
 
+void adiciona_aresta(Grafo &grafo, Aresta &aresta){
+    grafo.adjacencias[aresta.u].push_back(aresta.v);
+    grafo.adjacencias[aresta.v].push_back(aresta.u);
+    grafo.numero_arestas ++;
+}
+void cria_lista_graus(Grafo &grafo) {
+    // cria lista de grau dos vertices de G e guarda o valor do menor grau de G
+    for(auto adjacencia : grafo.adjacencias){
+        int grau_vertice = (int)adjacencia.size();
+        grafo.graus_vertices.push_back(grau_vertice);
+        
+        if(grau_vertice < grafo.menor_grau)
+            grafo.menor_grau = grau_vertice;
+    }
+}
+
 int encontra_indice(std::vector<int> &vetor_ordenado, int numero) {
     if((int)vetor_ordenado.size() == 0) {
         return -1;
@@ -95,7 +103,7 @@ int encontra_indice(std::vector<int> &vetor_ordenado, int numero) {
     return busca_binaria_alterada(vetor_ordenado, numero);    
 }
 
-Grafo cria_grafo_inflado(Grafo g, int k) {
+Grafo cria_grafo_inflado(Grafo &g, int k) {
     Grafo g_linha = cria_grafo(k * g.numero_vertices + 2 * g.numero_arestas);
     int soma_vizinhanca = 0;
     int indice_conversao;
@@ -106,12 +114,32 @@ Grafo cria_grafo_inflado(Grafo g, int k) {
         soma_vizinhanca += g.adjacencias[i].size();
         TABELA_INTERVALOS_BUSCA.push_back(indice_conversao);
     }
+    return g_linha;
 }
 
-/*
-K_Fator computa_k_fator_simples(Grafo &grafo) {
-    return;
-}*/
+// algoritmo do artigo
+Grafo computa_k_fator_simples(Grafo &g, int k) {
+    Grafo f;
+    
+    if(g.menor_grau < k) {
+        return f; // indicar jeito melhor de retornar null
+    }
+
+    Grafo g_linha = cria_grafo_inflado(g, k);
+
+    //computa emparelhamento maximo M em g_linha
+
+    //se M nao é perfeito, retorna null
+
+    // inicialmente f -> grafo que contem todos os vertices de G, sem arestas
+    f = cria_grafo(g.numero_vertices);
+
+
+    // adicione em f todas as arestas de G que pertencem aos vertices externos em M
+
+    return f;
+
+}
 
 int main() {
 
@@ -133,63 +161,12 @@ int main() {
 
         adiciona_aresta(grafo, aresta);
     }
-
-    for(auto adjacencia : grafo.adjacencias){
-        int grau_vertice = (int)adjacencia.size();
-        grafo.graus_vertices.push_back(grau_vertice);
-        
-        if(grau_vertice < grafo.menor_grau)
-            grafo.menor_grau = grau_vertice;
-        
-    }
-
-    std::cout << "Menor grau de G: " << grafo.menor_grau << std::endl;
-    // std::cout << "Numero de vértices de G: " << grafo.numero_vertices << std::endl;
+    cria_lista_graus(grafo);
 
     
-
-    // algoritmo pra encontrar o k fator
-    K_Fator f;
-    //f = computa_k_fator_simples(grafo);
+    Grafo f = computa_k_fator_simples(grafo, 2);
 
 
-
-    // std::vector<std::vector<int>> grafo_adjacencias;
-    // std::vector<std::vector<int>> grafo_linha_adjacencias;
-    // std::vector<int> TABELA_INTERVALOS_BUSCA;
-    // int soma_vizinhanca = 0;
-    // int k = 2;
-    // int indice_conversao;
-    // //acumulador grau
-    // // conversor de indices de G -> G' 
-    // // grafo da folha teste
-    // grafo_adjacencias.push_back(std::vector<int>{1, 2});              // 0 1 2 3
-    // grafo_adjacencias.push_back(std::vector<int>{0, 2, 3});           // 4 5 6 7 8 
-    // grafo_adjacencias.push_back(std::vector<int>{0, 1, 4});           // 9 10 11 12 13
-    // grafo_adjacencias.push_back(std::vector<int>{1, 4, 5, 6});        // 14 15 16 17 18 19
-    // grafo_adjacencias.push_back(std::vector<int>{2, 3, 6});           // 20 21 22 23 24
-    // grafo_adjacencias.push_back(std::vector<int>{3, 6});              // 25 26 27 28 
-    // grafo_adjacencias.push_back(std::vector<int>{3, 4, 5});           // 29 30 31 32 33
-
-    // for(int i = 0; i < (int)grafo_adjacencias.size(); i++) {
-
-    //     // criar tabela de busca de vertices
-    //     indice_conversao = i * k + soma_vizinhanca;
-    //     soma_vizinhanca += grafo_adjacencias[i].size();
-    //     TABELA_INTERVALOS_BUSCA.push_back(indice_conversao);
-        
-    //     //criar vertices de G'
-    //     std::vector<int> vertice_linha = {}; 
-
-    //     //std::cout << indice_conversao << std::endl;
-    //     for (int i = indice_conversao; i < indice_conversao + (int)grafo_adjacencias[i].size() + k - 1; i++){
-    //         vertice_linha.push_back(i);
-    //         //std::cout << i  << " " << std::ends;
-    //     } 
-    //     grafo_linha_adjacencias.push_back(vertice_linha);
-    //     //std::cout << '\n' << std::ends;
-    // }
-    // //std::vector<std::vector<int>> g_linha = cria_grafo_inflado(grafo);
 
 }
 
