@@ -7,11 +7,13 @@
 #define toDigit(c) (c-'0')
 
 typedef struct Grafo {
-    std::vector<std::vector<int>> adjacencias = {};
-    std::vector<int> graus_vertices = {};
     int numero_vertices = 0;
     int numero_arestas = 0;
     int menor_grau = 9999;
+    // inicializa com tamanho 'v' e valor padrao 0 (opcao)
+    // std::vector<int> graus_vertices = std::vector<int>(numero_vertices, 0);
+    std::vector<int> graus_vertices = {}; 
+    std::vector<std::vector<int>> adjacencias = {};
 } Grafo;
 
 
@@ -20,12 +22,19 @@ typedef struct Aresta {
     int v = 0;
 } Aresta;
 
+// no algoritmo, o kfator é um grafo, entao nao tem pq declarar isso
 // typedef struct K_Fator{
 //     std::vector<Aresta> lista_de_arestas;   
 // } K_Fator;
 
+
+/*
+    lookup table que vou usar pra relacionar vertice do grafo inflado 
+    com vertice do grafo de origem
+*/ 
 std::vector<int> TABELA_INTERVALOS_BUSCA;
 
+// caso precise depois (tirar caso contrario)
 int busca_binaria(std::vector<int> &vetor_ordenado, int valor_buscado) {
 
     int esq = 0;
@@ -47,7 +56,7 @@ int busca_binaria(std::vector<int> &vetor_ordenado, int valor_buscado) {
     return -1;
 }
 
-
+// para usar a TABELA_INTERVALOS_BUSCA
 int busca_binaria_alterada(std::vector<int> &vetor_ordenado, int valor_buscado) {
 
     int esq = 0;
@@ -85,8 +94,9 @@ void adiciona_aresta(Grafo &grafo, Aresta &aresta){
     grafo.adjacencias[aresta.v].push_back(aresta.u);
     grafo.numero_arestas ++;
 }
+
+// cria lista de grau dos vertices de G e guarda o valor do menor grau de G
 void cria_lista_graus(Grafo &grafo) {
-    // cria lista de grau dos vertices de G e guarda o valor do menor grau de G
     for(auto adjacencia : grafo.adjacencias){
         int grau_vertice = (int)adjacencia.size();
         grafo.graus_vertices.push_back(grau_vertice);
@@ -96,6 +106,7 @@ void cria_lista_graus(Grafo &grafo) {
     }
 }
 
+// encontrar indice correlacionado g <-> g'
 int encontra_indice(std::vector<int> &vetor_ordenado, int numero) {
     if((int)vetor_ordenado.size() == 0) {
         return -1;
@@ -103,6 +114,7 @@ int encontra_indice(std::vector<int> &vetor_ordenado, int numero) {
     return busca_binaria_alterada(vetor_ordenado, numero);    
 }
 
+// provavelmente ta faltando algo aqui
 Grafo cria_grafo_inflado(Grafo &g, int k) {
     Grafo g_linha = cria_grafo(k * g.numero_vertices + 2 * g.numero_arestas);
     int soma_vizinhanca = 0;
@@ -122,7 +134,7 @@ Grafo computa_k_fator_simples(Grafo &g, int k) {
     Grafo f;
     
     if(g.menor_grau < k) {
-        return f; // indicar jeito melhor de retornar null
+        return f; // pensar em jeito melhor de retornar null
     }
 
     Grafo g_linha = cria_grafo_inflado(g, k);
@@ -158,8 +170,16 @@ int main() {
         Aresta aresta;
         aresta.u = toDigit(linha[0]);
         aresta.v = toDigit(linha.length() - 1);
-
         adiciona_aresta(grafo, aresta);
+
+        /*
+            nao sei se jeito abaixo e melhor pra guardar os graus dos vertices
+            pois teria que iterar nas adjacencias de qualquer forma pra encontrar o menor grau dos vertices 
+        */
+
+        // grafo.graus_vertices[aresta.u]++;
+        // grafo.graus_vertices[aresta.v]++;
+
     }
     cria_lista_graus(grafo);
 
