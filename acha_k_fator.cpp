@@ -15,11 +15,15 @@ typedef struct Grafo {
 } Grafo;
 
 
+
 typedef struct Aresta {
     int u = 0;
     int v = 0;
 } Aresta;
 
+typedef struct Emparelhamento {
+    std::vector<Aresta> arestas = {};
+}Emparelhamento;
 
 /*
     lookup table que vou usar pra relacionar vertice do grafo inflado
@@ -124,21 +128,46 @@ Grafo cria_grafo_inflado(Grafo& g, int k) {
     return g_linha;
 }
 
+Emparelhamento computa_emparelhamento_maximo(Grafo& g) {
+    Emparelhamento m;
+    return m;
+}
+
+/*
+* todo vértice do grafo é extremidade de alguma aresta do emparelhamento ?
+*/
+bool decide_emparelhamento_perfeito(Emparelhamento& m, Grafo& g) {
+
+       
+    // pra cada aresta, verifica se tem o o correspondente na lista de adjacencias do grafo
+    for (Aresta a : m.arestas) {
+       
+    }
+
+    return false;
+}
+
 // algoritmo do artigo
 Grafo computa_k_fator_simples(Grafo& g, int k) {
     Grafo f;
+    Emparelhamento m;
     
     if (g.menor_grau < k) {
-        std::cout << "Não existe " << k << "-fator no grafo.";
+        std::cout << "Não existe " << k << "-fator no grafo." << g.menor_grau << " < " << k <<".";
         exit(0);
     }
 
     Grafo g_linha = cria_grafo_inflado(g, k);
 
     //computa emparelhamento maximo M em g_linha
+    m = computa_emparelhamento_maximo(g_linha);
 
     //se M nao é perfeito, retorna null
-
+    if (!decide_emparelhamento_perfeito(m, g_linha)) {
+        std::cout << "Não existe " << k << "-fator no grafo. Emparelhamento de g não é perfeito.";
+        exit(0);
+    }
+    
     // inicialmente f -> grafo que contem todos os vertices de G, sem arestas
     f = cria_grafo(g.numero_vertices);
 
@@ -169,8 +198,8 @@ int main() {
 
     }
     cria_lista_graus(grafo);
-    int k = 2;
 
+    int k = 2;
     Grafo f = computa_k_fator_simples(grafo, k);
 
  }
