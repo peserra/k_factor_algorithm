@@ -10,9 +10,7 @@ typedef struct Grafo {
     int numero_vertices = 0;
     int numero_arestas = 0;
     int menor_grau = 9999;
-    // inicializa com tamanho 'v' e valor padrao 0 (opcao)
-    // std::vector<int> graus_vertices = std::vector<int>(numero_vertices, 0);
-    std::vector<int> graus_vertices = {}; 
+    std::vector<int> graus_vertices = {};
     std::vector<std::vector<int>> adjacencias = {};
 } Grafo;
 
@@ -22,34 +20,30 @@ typedef struct Aresta {
     int v = 0;
 } Aresta;
 
-// no algoritmo, o kfator é um grafo, entao nao tem pq declarar isso
-// typedef struct K_Fator{
-//     std::vector<Aresta> lista_de_arestas;   
-// } K_Fator;
-
 
 /*
-    lookup table que vou usar pra relacionar vertice do grafo inflado 
+    lookup table que vou usar pra relacionar vertice do grafo inflado
     com vertice do grafo de origem
-*/ 
+*/
 std::vector<int> TABELA_INTERVALOS_BUSCA;
 
 // caso precise depois (tirar caso contrario)
-int busca_binaria(std::vector<int> &vetor_ordenado, int valor_buscado) {
+int busca_binaria(std::vector<int>& vetor_ordenado, int valor_buscado) {
 
     int esq = 0;
     int dir = vetor_ordenado.size() - 1;
 
-    while(esq <= dir) {
+    while (esq <= dir) {
 
         int meio = floor((double)(esq + dir) / 2);
-        
-        if(vetor_ordenado[meio] == valor_buscado) {
+
+        if (vetor_ordenado[meio] == valor_buscado) {
             return meio;
         }
-        else if(vetor_ordenado[meio] < valor_buscado) {
+        else if (vetor_ordenado[meio] < valor_buscado) {
             esq = meio + 1;
-        } else {
+        }
+        else {
             dir = meio - 1;
         }
     }
@@ -57,70 +51,71 @@ int busca_binaria(std::vector<int> &vetor_ordenado, int valor_buscado) {
 }
 
 // para usar a TABELA_INTERVALOS_BUSCA
-int busca_binaria_alterada(std::vector<int> &vetor_ordenado, int valor_buscado) {
+int busca_binaria_alterada(std::vector<int>& vetor_ordenado, int valor_buscado) {
 
     int esq = 0;
     int dir = vetor_ordenado.size() - 1;
     int indice_retorno = -1;
-    
-    while(esq <= dir) {
+
+    while (esq <= dir) {
 
         int meio = floor((double)(esq + dir) / 2);
-        
-        if(vetor_ordenado[meio] <= valor_buscado) {
+
+        if (vetor_ordenado[meio] <= valor_buscado) {
             indice_retorno = meio;
             esq = meio + 1;
-        } else {
+        }
+        else {
             dir = meio - 1;
         }
     }
     return indice_retorno;
 }
 
-Grafo cria_grafo(int numero_vertices){
+Grafo cria_grafo(int numero_vertices) {
     Grafo novo_grafo;
 
     novo_grafo.numero_vertices = numero_vertices;
 
-    for(int v = 0; v < numero_vertices; v++){
-       std::vector<int> adjacencia = {};
-       novo_grafo.adjacencias.push_back(adjacencia); 
+    for (auto v = 0; v < numero_vertices; v++) {
+        std::vector<int> adjacencia = {};
+        novo_grafo.adjacencias.push_back(adjacencia);
     }
     return novo_grafo;
 }
 
-void adiciona_aresta(Grafo &grafo, Aresta &aresta){
+void adiciona_aresta(Grafo& grafo, Aresta& aresta) {
     grafo.adjacencias[aresta.u].push_back(aresta.v);
     grafo.adjacencias[aresta.v].push_back(aresta.u);
-    grafo.numero_arestas ++;
+    grafo.numero_arestas++;
 }
 
 // cria lista de grau dos vertices de G e guarda o valor do menor grau de G
-void cria_lista_graus(Grafo &grafo) {
-    for(auto adjacencia : grafo.adjacencias){
+void cria_lista_graus(Grafo& grafo) {
+    for (std::vector<int> adjacencia : grafo.adjacencias) {
         int grau_vertice = (int)adjacencia.size();
         grafo.graus_vertices.push_back(grau_vertice);
-        
-        if(grau_vertice < grafo.menor_grau)
+
+        if (grau_vertice < grafo.menor_grau)
             grafo.menor_grau = grau_vertice;
     }
 }
 
 // encontrar indice correlacionado g <-> g'
-int encontra_indice(std::vector<int> &vetor_ordenado, int numero) {
-    if((int)vetor_ordenado.size() == 0) {
+int encontra_indice(std::vector<int>& vetor_ordenado, int numero) {
+    if ((int)vetor_ordenado.size() == 0) {
         return -1;
     }
-    return busca_binaria_alterada(vetor_ordenado, numero);    
+    return busca_binaria_alterada(vetor_ordenado, numero);
 }
 
 // provavelmente ta faltando algo aqui
-Grafo cria_grafo_inflado(Grafo &g, int k) {
+Grafo cria_grafo_inflado(Grafo& g, int k) {
     Grafo g_linha = cria_grafo(k * g.numero_vertices + 2 * g.numero_arestas);
     int soma_vizinhanca = 0;
     int indice_conversao;
 
-    for(int i = 0; i < (int)g.adjacencias.size(); i++) {
+    for (int i = 0; i < (int)g.adjacencias.size(); i++) {
         // criar tabela de busca de vertices
         indice_conversao = i * k + soma_vizinhanca;
         soma_vizinhanca += g.adjacencias[i].size();
@@ -130,11 +125,12 @@ Grafo cria_grafo_inflado(Grafo &g, int k) {
 }
 
 // algoritmo do artigo
-Grafo computa_k_fator_simples(Grafo &g, int k) {
+Grafo computa_k_fator_simples(Grafo& g, int k) {
     Grafo f;
     
-    if(g.menor_grau < k) {
-        return f; // pensar em jeito melhor de retornar null
+    if (g.menor_grau < k) {
+        std::cout << "Não existe " << k << "-fator no grafo.";
+        exit(0);
     }
 
     Grafo g_linha = cria_grafo_inflado(g, k);
@@ -150,7 +146,6 @@ Grafo computa_k_fator_simples(Grafo &g, int k) {
     // adicione em f todas as arestas de G que pertencem aos vertices externos em M
 
     return f;
-
 }
 
 int main() {
@@ -163,30 +158,19 @@ int main() {
     Grafo grafo = cria_grafo(numero_vertices);
 
     // leitura das linhas do terminal para criar as arestas
-    while (getline(std::cin,linha)){
-        if(linha.empty())
+    while (getline(std::cin, linha)) {
+        if (linha.empty())
             break;
-        
+
         Aresta aresta;
         aresta.u = toDigit(linha[0]);
         aresta.v = toDigit(linha.length() - 1);
         adiciona_aresta(grafo, aresta);
 
-        /*
-            nao sei se jeito abaixo e melhor pra guardar os graus dos vertices
-            pois teria que iterar nas adjacencias de qualquer forma pra encontrar o menor grau dos vertices 
-        */
-
-        // grafo.graus_vertices[aresta.u]++;
-        // grafo.graus_vertices[aresta.v]++;
-
     }
     cria_lista_graus(grafo);
+    int k = 2;
 
-    
-    Grafo f = computa_k_fator_simples(grafo, 2);
+    Grafo f = computa_k_fator_simples(grafo, k);
 
-
-
-}
-
+ }
