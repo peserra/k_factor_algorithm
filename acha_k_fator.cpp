@@ -3,8 +3,9 @@
 #include <algorithm>
 #include <math.h>
 #include <string>
+#include <sstream>
 
-#define toDigit(c) (c-'0')
+//#define toDigit(c) (c-'0')
 
 typedef struct Grafo {
     int numero_vertices = 0;
@@ -116,6 +117,8 @@ int encontra_indice(std::vector<int>& vetor_ordenado, int numero) {
 // provavelmente ta faltando algo aqui
 Grafo cria_grafo_inflado(Grafo& g, int k) {
     Grafo g_linha = cria_grafo(k * g.numero_vertices + 2 * g.numero_arestas);
+    std::cout << g_linha.numero_vertices << std::endl;
+    std::cout << g_linha.adjacencias.size() << std::endl;
     int soma_vizinhanca = 0;
     int indice_conversao;
 
@@ -125,6 +128,20 @@ Grafo cria_grafo_inflado(Grafo& g, int k) {
         soma_vizinhanca += g.adjacencias[i].size();
         TABELA_INTERVALOS_BUSCA.push_back(indice_conversao);
     }
+    // preciso criar o grafo inflado (as arestas)
+    /*
+        Gadget tem:
+        k core vertices
+        d inner vertices
+        d outer vertices
+
+        outter vertice se conecta aos vertices internos (1 - 1)
+        inner vertice se conecta aos vertices core (1-n)
+
+        outer vertices se conectam entre si, para conectar gadgets
+
+    */
+
     return g_linha;
 }
 
@@ -153,7 +170,7 @@ Grafo computa_k_fator_simples(Grafo& g, int k) {
     Emparelhamento m;
     
     if (g.menor_grau < k) {
-        std::cout << "Não existe " << k << "-fator no grafo." << g.menor_grau << " < " << k <<".";
+        std::cout << "Não existe " << k << "-fator no grafo." << g.menor_grau << " < " << k <<"." << std::endl;
         exit(0);
     }
 
@@ -164,7 +181,7 @@ Grafo computa_k_fator_simples(Grafo& g, int k) {
 
     //se M nao é perfeito, retorna null
     if (!decide_emparelhamento_perfeito(m, g_linha)) {
-        std::cout << "Não existe " << k << "-fator no grafo. Emparelhamento de g não é perfeito.";
+        std::cout << "Não existe " << k << "-fator no grafo. Emparelhamento de g não é perfeito."<< std::endl;
         exit(0);
     }
     
@@ -179,6 +196,8 @@ Grafo computa_k_fator_simples(Grafo& g, int k) {
 
 int main() {
 
+    std::cout << "Insira o grafo abaixo (primeira linha: #vertices, linhas seguintes: u v arestas." << std::endl;
+
     // le entrada para montar o grafo
     int numero_vertices = 0;
     std::string linha;
@@ -192,8 +211,9 @@ int main() {
             break;
 
         Aresta aresta;
-        aresta.u = toDigit(linha[0]);
-        aresta.v = toDigit(linha.length() - 1);
+        std::stringstream stream(linha);
+        // extraindo vertices:
+        stream >> aresta.u >> aresta.v;
         adiciona_aresta(grafo, aresta);
 
     }
