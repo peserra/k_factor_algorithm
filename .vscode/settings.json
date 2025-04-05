@@ -51,5 +51,6 @@
         "span": "cpp",
         "text_encoding": "cpp",
         "variant": "cpp"
-    }
+    },
+    "C_Cpp.default.compilerPath": "/usr/lib/ccache/clang++-18"
 }

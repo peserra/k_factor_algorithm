@@ -10,7 +10,8 @@
  * vou colocar using std namespace pra limpar um pouco o codigo
  */
 
-typedef struct Grafo {
+typedef struct Grafo
+{
   int numero_vertices = 0;
   int numero_arestas = 0;
   int menor_grau = 9999;
@@ -18,12 +19,14 @@ typedef struct Grafo {
   std::vector<std::vector<int>> adjacencias = {};
 } Grafo;
 
-typedef struct Aresta {
+typedef struct Aresta
+{
   int u = 0;
   int v = 0;
 } Aresta;
 
-typedef struct Emparelhamento {
+typedef struct Emparelhamento
+{
   std::vector<Aresta> arestas = {};
 } Emparelhamento;
 
@@ -38,20 +41,27 @@ typedef struct Emparelhamento {
 std::vector<int> TABELA_INTERVALOS_BUSCA;
 
 // caso precise depois (tirar caso contrario)
-int busca_binaria(std::vector<int> &vetor_ordenado, int valor_buscado) {
+int busca_binaria(std::vector<int> &vetor_ordenado, int valor_buscado)
+{
 
   int esq = 0;
   int dir = vetor_ordenado.size() - 1;
 
-  while (esq <= dir) {
+  while (esq <= dir)
+  {
 
     int meio = floor((double)(esq + dir) / 2);
 
-    if (vetor_ordenado[meio] == valor_buscado) {
+    if (vetor_ordenado[meio] == valor_buscado)
+    {
       return meio;
-    } else if (vetor_ordenado[meio] < valor_buscado) {
+    }
+    else if (vetor_ordenado[meio] < valor_buscado)
+    {
       esq = meio + 1;
-    } else {
+    }
+    else
+    {
       dir = meio - 1;
     }
   }
@@ -60,47 +70,57 @@ int busca_binaria(std::vector<int> &vetor_ordenado, int valor_buscado) {
 
 // para usar a TABELA_INTERVALOS_BUSCA
 int busca_binaria_alterada(std::vector<int> &vetor_ordenado,
-                           int valor_buscado) {
+                           int valor_buscado)
+{
 
   int esq = 0;
   int dir = vetor_ordenado.size() - 1;
   int indice_retorno = -1;
 
-  while (esq <= dir) {
+  while (esq <= dir)
+  {
 
     int meio = floor((double)(esq + dir) / 2);
 
-    if (vetor_ordenado[meio] <= valor_buscado) {
+    if (vetor_ordenado[meio] <= valor_buscado)
+    {
       indice_retorno = meio;
       esq = meio + 1;
-    } else {
+    }
+    else
+    {
       dir = meio - 1;
     }
   }
   return indice_retorno;
 }
 
-Grafo cria_grafo(int numero_vertices) {
+Grafo cria_grafo(int numero_vertices)
+{
   Grafo novo_grafo;
 
   novo_grafo.numero_vertices = numero_vertices;
 
-  for (auto v = 0; v < numero_vertices; v++) {
+  for (auto v = 0; v < numero_vertices; v++)
+  {
     std::vector<int> adjacencia = {};
     novo_grafo.adjacencias.push_back(adjacencia);
   }
   return novo_grafo;
 }
 
-void adiciona_aresta(Grafo &grafo, Aresta &aresta) {
+void adiciona_aresta(Grafo &grafo, Aresta &aresta)
+{
   grafo.adjacencias[aresta.u].push_back(aresta.v);
   grafo.adjacencias[aresta.v].push_back(aresta.u);
   grafo.numero_arestas++;
 }
 
 // cria lista de grau dos vertices de G e calcula o valor do menor grau de G
-void cria_lista_graus(Grafo &grafo) {
-  for (std::vector<int> adjacencia : grafo.adjacencias) {
+void cria_lista_graus(Grafo &grafo)
+{
+  for (std::vector<int> adjacencia : grafo.adjacencias)
+  {
     int grau_vertice = (int)adjacencia.size();
     grafo.graus_vertices.push_back(grau_vertice);
 
@@ -110,39 +130,47 @@ void cria_lista_graus(Grafo &grafo) {
 }
 
 // encontrar indice correlacionado g <-> g'
-int encontra_indice(std::vector<int> &vetor_ordenado, int numero) {
-  if ((int)vetor_ordenado.size() == 0) {
+int encontra_indice(std::vector<int> &vetor_ordenado, int numero)
+{
+  if ((int)vetor_ordenado.size() == 0)
+  {
     return -1;
   }
   return busca_binaria_alterada(vetor_ordenado, numero);
 }
 
-void imprime_lista_ints(const std::vector<int> &lista) {
-  for (auto i : lista) {
+void imprime_lista_ints(const std::vector<int> &lista)
+{
+  for (auto i : lista)
+  {
     std::cout << i << ", ";
   }
 }
 
-void imprime_lista_adjacencia(const std::vector<std::vector<int>> &adj) {
-  for (const auto &i : adj) {
+void imprime_lista_adjacencia(const std::vector<std::vector<int>> &adj)
+{
+  for (const auto &i : adj)
+  {
     imprime_lista_ints(i);
     std::cout << '\n';
   }
 }
 
-Grafo cria_grafo_inflado(const Grafo &g, const int &k) {
+Grafo cria_grafo_inflado(const Grafo &g, const int &k)
+{
   /*
    * numero de vertices de g' é k * v(g) + 2 * soma numero de graus(g) (2 * |E|)
    */
   Grafo g_linha = cria_grafo(k * g.numero_vertices + 4 * g.numero_arestas);
-  
+
   std::cout << "tamanho da lista de adjacencias: " << g_linha.adjacencias.size()
             << std::endl;
 
   int soma_vizinhanca = 0;
   int indice_conversao;
 
-  for (int i = 0; i < (int)g.adjacencias.size(); i++) {
+  for (int i = 0; i < (int)g.adjacencias.size(); i++)
+  {
     // criar tabela de busca de vertices
     indice_conversao = i * k + soma_vizinhanca;
     soma_vizinhanca += 2 * g.adjacencias[i].size();
@@ -184,14 +212,15 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k) {
    * nao existir, verificando essa conexao com a lista de adjacencias de g.
    */
 
-  for(auto i = 0; i < g.numero_vertices; i++){
-    auto ultimo_vertice = TABELA_INTERVALOS_BUSCA[i] + g.graus_vertices[i] * 2 + 1; 
+  for (auto i = 0; i < g.numero_vertices; i++)
+  {
+    auto ultimo_vertice = TABELA_INTERVALOS_BUSCA[i] + g.graus_vertices[i] * 2 + 1;
 
-    std::vector<int> conjunto_core_vert; 
-    std::vector<int> conjunto_inner_vert; 
-    std::vector<int> conjunto_outer_vert; 
+    std::vector<int> conjunto_core_vert;
+    std::vector<int> conjunto_inner_vert;
+    std::vector<int> conjunto_outer_vert;
 
-    int ultimo_indice_core =  TABELA_INTERVALOS_BUSCA[i] + k - 1;
+    int ultimo_indice_core = TABELA_INTERVALOS_BUSCA[i] + k - 1;
     int ultimo_indice_inner = TABELA_INTERVALOS_BUSCA[i] + g.graus_vertices[i] + 1;
 
     conjunto_core_vert.reserve(k);
@@ -200,12 +229,29 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k) {
 
     int j = TABELA_INTERVALOS_BUSCA[i];
 
-    while (j <= ultimo_vertice){
-      if (j <= ultimo_indice_core){
+    Aresta aresta;
+    while (j <= ultimo_vertice)
+    {
+      if (j <= ultimo_indice_core)
+      {
         // core vertice
-      } else if( j <= ultimo_indice_inner){
+        auto aux_index = ultimo_indice_core + 1;
+        while (aux_index <= ultimo_indice_inner)
+        {
+          aresta.u = j;
+          aresta.v = aux_index;
+          std::cout << aresta.u << " " << aresta.v << std::endl;
+          adiciona_aresta(g_linha, aresta);
+          aux_index++;
+        }
+        exit(0);
+      }
+      else if (j <= ultimo_indice_inner)
+      {
         // inner vertice
-      } else {
+      }
+      else
+      {
         // outer vertice
       }
       j++;
@@ -236,15 +282,13 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k) {
     std::cout << "\n";
     std::cout << "--------------------------------------------------" << std::endl;
     */
-
-
-
   }
 
   return g_linha;
 }
 
-Emparelhamento computa_emparelhamento_maximo(const Grafo &g) {
+Emparelhamento computa_emparelhamento_maximo(const Grafo &g)
+{
   Emparelhamento m;
   return m;
 }
@@ -252,7 +296,8 @@ Emparelhamento computa_emparelhamento_maximo(const Grafo &g) {
 /*
  * todo vértice do grafo é extremidade de alguma aresta do emparelhamento ?
  */
-bool decide_emparelhamento_perfeito(const Emparelhamento &m, const Grafo &g) {
+bool decide_emparelhamento_perfeito(const Emparelhamento &m, const Grafo &g)
+{
 
   // pra cada aresta, verifica se tem o o correspondente na lista de adjacencias
   // do grafo
@@ -264,11 +309,13 @@ bool decide_emparelhamento_perfeito(const Emparelhamento &m, const Grafo &g) {
 }
 
 // algoritmo do artigo
-Grafo computa_k_fator_simples(const Grafo &g, const int &k) {
+Grafo computa_k_fator_simples(const Grafo &g, const int &k)
+{
   Grafo f;
   Emparelhamento m;
 
-  if (g.menor_grau < k) {
+  if (g.menor_grau < k)
+  {
     std::cout << "Não existe " << k << "-fator no grafo." << g.menor_grau
               << " < " << k << "." << std::endl;
     exit(0);
@@ -280,7 +327,8 @@ Grafo computa_k_fator_simples(const Grafo &g, const int &k) {
   m = computa_emparelhamento_maximo(g_linha);
 
   // se M nao é perfeito, retorna null
-  if (!decide_emparelhamento_perfeito(m, g_linha)) {
+  if (!decide_emparelhamento_perfeito(m, g_linha))
+  {
     std::cout << "Não existe " << k
               << "-fator no grafo. Emparelhamento de g não é perfeito."
               << std::endl;
@@ -296,7 +344,8 @@ Grafo computa_k_fator_simples(const Grafo &g, const int &k) {
   return f;
 }
 
-int main() {
+int main()
+{
 
   std::cout << "Insira o grafo abaixo (primeira linha: #vertices, linhas "
                "seguintes: u v arestas."
@@ -310,7 +359,8 @@ int main() {
   Grafo grafo = cria_grafo(numero_vertices);
 
   // leitura das linhas do terminal para criar as arestas
-  while (getline(std::cin, linha)) {
+  while (getline(std::cin, linha))
+  {
     if (linha.empty())
       break;
 
