@@ -186,46 +186,14 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
    Each inner vertex is adjacent to exactly one outer vertex, while each core
    vertex is adjacent to all inner vertices. Vertices within the same class are
    not adjacent to one another.
-
-      Gadget tem:
-      k core vertices
-      d inner vertices
-      d outer vertices
-
-      outter vertice se conecta aos vertices internos (1 - 1)
-      inner vertice se conecta aos vertices core (1-n)
-
-      outer vertices se conectam entre si, para conectar gadgets
-
   */
-
-  // preciso conectar os vértices de g_linha, utilizando a info que tenho de g
-  // para as arestas externas (saber em quem eu tenho que conectar os vértices
-  // externos)
-  /*
-   * para cada adjacencia de g_linha, ande nos vértices
-   * se vertice pertence a core: conecta com todos os seus inner correspondentes
-   * (k <= i <= k + d) se vertice pertence a inner: conecta cada um com um outer
-   * correspondente (k+d <= i <= k+2d)
-   *
-   * caso contrario, conecte cada outer a outro outer correspondente, se conexao
-   * nao existir, verificando essa conexao com a lista de adjacencias de g.
-   */
 
   for (auto i = 0; i < g.numero_vertices; i++)
   {
     auto ultimo_vertice = TABELA_INTERVALOS_BUSCA[i] + g.graus_vertices[i] * 2 + 1;
 
-    std::vector<int> conjunto_core_vert;
-    std::vector<int> conjunto_inner_vert;
-    std::vector<int> conjunto_outer_vert;
-
     int ultimo_indice_core = TABELA_INTERVALOS_BUSCA[i] + k - 1;
     int ultimo_indice_inner = TABELA_INTERVALOS_BUSCA[i] + g.graus_vertices[i] + 1;
-
-    conjunto_core_vert.reserve(k);
-    conjunto_inner_vert.reserve(g.graus_vertices[i]);
-    conjunto_outer_vert.reserve(g.graus_vertices[i]);
 
     int j = TABELA_INTERVALOS_BUSCA[i];
 
@@ -234,7 +202,7 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
     {
       if (j <= ultimo_indice_core)
       {
-        // core vertice
+        // core vertice conecta 1-n com inner vertices
         auto aux_index = ultimo_indice_core + 1;
         while (aux_index <= ultimo_indice_inner)
         {
@@ -244,44 +212,24 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
           adiciona_aresta(g_linha, aresta);
           aux_index++;
         }
-        exit(0);
       }
       else if (j <= ultimo_indice_inner)
       {
-        // inner vertice
+        // inner vertice conecta 1-1 com outer vertices
+        aresta.u = j;
+        aresta.v = j + g.graus_vertices[i];
+        std::cout << aresta.u << " " << aresta.v << std::endl;
+        adiciona_aresta(g_linha, aresta);
       }
       else
       {
-        // outer vertice
-      }
+        // outer vertice conecta gadgets
+        // posso criar uma matriz n x n no grafo inflado para guardar vertices outer que ja foram conectados entre si
+        // posso também utilizar a ordem que os elementos aparecem
+            }
       j++;
     }
-
-    /*
-    while (j <= ultimo_vertice){
-      if (j <= TABELA_INTERVALOS_BUSCA[i] + k - 1){
-        conjunto_core_vert.push_back(j);
-      } else if( j <= TABELA_INTERVALOS_BUSCA[i] + g.graus_vertices[i] + 1){
-        conjunto_inner_vert.push_back(j);
-      } else {
-        conjunto_outer_vert.push_back(j);
-      }
-      j++;
-    } */
-
-    /*
-    std::cout << "vertice: " << i << " fica:" << std::endl;
-    std::cout << "lista core:\n";
-    imprime_lista_ints(conjunto_core_vert);
-    std::cout << "\n";
-    std::cout << "lista inner:\n";
-    imprime_lista_ints(conjunto_inner_vert);
-    std::cout << "\n";
-    std::cout << "lista outer:\n";
-    imprime_lista_ints(conjunto_outer_vert);
-    std::cout << "\n";
-    std::cout << "--------------------------------------------------" << std::endl;
-    */
+    exit(0);
   }
 
   return g_linha;

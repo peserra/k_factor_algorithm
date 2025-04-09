@@ -1,0 +1,19 @@
+# Ignore build directory
+build/
+
+# Ignore output directory
+output/
+
+# Ignore CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+
+# Ignore other common files
+*.o
+*.obj
+*.log
+*.tmp
+*.swp
+*.DS_Store
