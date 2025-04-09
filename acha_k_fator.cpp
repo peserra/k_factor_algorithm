@@ -226,7 +226,7 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
         // outer vertice conecta gadgets
         // posso criar uma matriz n x n no grafo inflado para guardar vertices outer que ja foram conectados entre si
         // posso também utilizar a ordem que os elementos aparecem
-            }
+      }
       j++;
     }
     exit(0);
