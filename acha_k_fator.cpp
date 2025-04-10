@@ -224,6 +224,7 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
       else
       {
         // outer vertice conecta gadgets
+        // usar matriz de adjacencia, se for vazia, pode conectar nele
         // posso criar uma matriz n x n no grafo inflado para guardar vertices outer que ja foram conectados entre si
         // posso também utilizar a ordem que os elementos aparecem
       }
