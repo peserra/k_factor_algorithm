@@ -176,6 +176,8 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
     soma_vizinhanca += 2 * g.adjacencias[i].size();
     TABELA_INTERVALOS_BUSCA.push_back(indice_conversao);
   }
+  std::cout << "ADJACENCIAS DE G" << std::endl;
+  imprime_lista_adjacencia(g.adjacencias);
   // preciso criar o grafo inflado (as arestas)
   /*
    A gadget Γk,d , 2<=k<=d, has d outer vertices, d inner vertices, and k core
@@ -196,7 +198,7 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
     int ultimo_indice_inner = TABELA_INTERVALOS_BUSCA[i] + g.graus_vertices[i] + 1;
 
     int j = TABELA_INTERVALOS_BUSCA[i];
-
+    std::cout << "VERTICE DE G: " << i << std::endl;
     Aresta aresta;
     while (j <= ultimo_vertice)
     {
@@ -224,15 +226,36 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
       else
       {
         // outer vertice conecta gadgets
-        // usar matriz de adjacencia, se for vazia, pode conectar nele
-        // posso criar uma matriz n x n no grafo inflado para guardar vertices outer que ja foram conectados entre si
-        // posso também utilizar a ordem que os elementos aparecem
+        // pega indice do vertice outter (0..d(v))
+        auto relative_index = j - ultimo_indice_inner - 1;
+        // pega o vertice que está nesse indice nas adjacencias de g (V(G)i[1], V(G)i[2] ...)
+        auto vertice_conectado = g.adjacencias[i].at(relative_index);
+        // calculo do primeiro indice outer no destino
+        auto indice_outer = TABELA_INTERVALOS_BUSCA[vertice_conectado] + g.graus_vertices[vertice_conectado] + 2;
+
+        auto ultimo_indice_destino = TABELA_INTERVALOS_BUSCA[vertice_conectado] + g.graus_vertices[vertice_conectado] * 2 + 1;
+        // caminho nos vértices do destino
+        while (indice_outer < ultimo_indice_destino)
+        {
+          // precisa de verificacao a mais aqui:
+          if (g_linha.adjacencias[indice_outer].size() == 0)
+          {
+            // conecto j com esse cara
+            aresta.u = j;
+            aresta.v = indice_outer;
+            std::cout << aresta.u << " " << aresta.v << std::endl;
+            adiciona_aresta(g_linha, aresta);
+            break;
+          }
+          indice_outer++;
+        }
       }
       j++;
     }
-    exit(0);
+    std::cout << "\n";
   }
 
+  exit(0);
   return g_linha;
 }
 
