@@ -31,14 +31,16 @@ typedef struct Emparelhamento
 } Emparelhamento;
 
 /*
-    lookup table que vou usar pra relacionar vertice do grafo inflado
-    com vertice do grafo de origem
+  TABELA_INDICES_INICIAIS é uma tabela de consulta que mapeia cada vértice do grafo original G
+  para o índice inicial do conjunto de vértices correspondentes no grafo inflado G'.
 
-    cada vértice de g corresponde a um conjunto de vértices de g', sendo assim
-    essa tabela guarda o conjunto de vértices de g' no indice que representa
-    o vértice de g.
+  Cada vértice i em G gera um conjunto de vértices em G', e o valor armazenado em
+  TABELA_INDICES_INICIAIS[i] indica o índice do primeiro vértice desse conjunto em G'.
+
+  Por exemplo, se o vértice 0 de G gera os vértices 0, 1, 2, 3, 4, 5 em G',
+  então TABELA_INDICES_INICIAIS[0] = 0.
 */
-std::vector<int> TABELA_INTERVALOS_BUSCA;
+std::vector<int> TABELA_INDICES_INICIAIS;
 
 // caso precise depois (tirar caso contrario)
 int busca_binaria(std::vector<int> &vetor_ordenado, int valor_buscado)
@@ -68,7 +70,7 @@ int busca_binaria(std::vector<int> &vetor_ordenado, int valor_buscado)
   return -1;
 }
 
-// para usar a TABELA_INTERVALOS_BUSCA
+// para usar a TABELA_INDICES_INICIAIS
 int busca_binaria_alterada(std::vector<int> &vetor_ordenado,
                            int valor_buscado)
 {
@@ -149,9 +151,10 @@ void imprime_lista_ints(const std::vector<int> &lista)
 
 void imprime_lista_adjacencia(const std::vector<std::vector<int>> &adj)
 {
-  for (const auto &i : adj)
+  for (size_t i = 0; i < adj.size(); ++i)
   {
-    imprime_lista_ints(i);
+    std::cout << i << " : " << std::ends;
+    imprime_lista_ints(adj[i]);
     std::cout << '\n';
   }
 }
@@ -174,7 +177,7 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
     // criar tabela de busca de vertices
     indice_conversao = i * k + soma_vizinhanca;
     soma_vizinhanca += 2 * g.adjacencias[i].size();
-    TABELA_INTERVALOS_BUSCA.push_back(indice_conversao);
+    TABELA_INDICES_INICIAIS.push_back(indice_conversao);
   }
   std::cout << "ADJACENCIAS DE G" << std::endl;
   imprime_lista_adjacencia(g.adjacencias);
@@ -192,25 +195,26 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
 
   for (auto i = 0; i < g.numero_vertices; i++)
   {
-    auto ultimo_vertice = TABELA_INTERVALOS_BUSCA[i] + g.graus_vertices[i] * 2 + 1;
+    auto ultimo_vertice = TABELA_INDICES_INICIAIS[i] + g.graus_vertices[i] * 2 + 1;
 
-    int ultimo_indice_core = TABELA_INTERVALOS_BUSCA[i] + k - 1;
-    int ultimo_indice_inner = TABELA_INTERVALOS_BUSCA[i] + g.graus_vertices[i] + 1;
+    int ultimo_indice_core = TABELA_INDICES_INICIAIS[i] + k - 1;
+    int ultimo_indice_inner = TABELA_INDICES_INICIAIS[i] + g.graus_vertices[i] + 1;
 
-    int j = TABELA_INTERVALOS_BUSCA[i];
-    std::cout << "VERTICE DE G: " << i << std::endl;
+    int j = TABELA_INDICES_INICIAIS[i];
     Aresta aresta;
     while (j <= ultimo_vertice)
     {
       if (j <= ultimo_indice_core)
       {
         // core vertice conecta 1-n com inner vertices
+        /*
+          laço itera em cada um dos vértices inner, conectando os com o vértice atual
+        */
         auto aux_index = ultimo_indice_core + 1;
         while (aux_index <= ultimo_indice_inner)
         {
           aresta.u = j;
           aresta.v = aux_index;
-          std::cout << aresta.u << " " << aresta.v << std::endl;
           adiciona_aresta(g_linha, aresta);
           aux_index++;
         }
@@ -218,9 +222,11 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
       else if (j <= ultimo_indice_inner)
       {
         // inner vertice conecta 1-1 com outer vertices
+        /*
+          |inner(V(G)j)| == |outter(V(G)j)|, basta connectar j com o vértice que esta a d(j) de distancia
+        */
         aresta.u = j;
         aresta.v = j + g.graus_vertices[i];
-        std::cout << aresta.u << " " << aresta.v << std::endl;
         adiciona_aresta(g_linha, aresta);
       }
       else
@@ -231,31 +237,28 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
         // pega o vertice que está nesse indice nas adjacencias de g (V(G)i[1], V(G)i[2] ...)
         auto vertice_conectado = g.adjacencias[i].at(relative_index);
         // calculo do primeiro indice outer no destino
-        auto indice_outer = TABELA_INTERVALOS_BUSCA[vertice_conectado] + g.graus_vertices[vertice_conectado] + 2;
+        auto indice_outter = TABELA_INDICES_INICIAIS[vertice_conectado] + g.graus_vertices[vertice_conectado] + 2;
 
-        auto ultimo_indice_destino = TABELA_INTERVALOS_BUSCA[vertice_conectado] + g.graus_vertices[vertice_conectado] * 2 + 1;
+        auto ultimo_indice_destino = TABELA_INDICES_INICIAIS[vertice_conectado] + g.graus_vertices[vertice_conectado] * 2 + 1;
         // caminho nos vértices do destino
-        while (indice_outer < ultimo_indice_destino)
+        while (indice_outter <= ultimo_indice_destino)
         {
-          // precisa de verificacao a mais aqui:
-          if (g_linha.adjacencias[indice_outer].size() == 0)
+          // garante que vértice de destino nao foi conectado ainda, logo está livre para conexao com outro outter
+          if (g_linha.adjacencias[indice_outter].size() == 0)
           {
             // conecto j com esse cara
             aresta.u = j;
-            aresta.v = indice_outer;
-            std::cout << aresta.u << " " << aresta.v << std::endl;
+            aresta.v = indice_outter;
             adiciona_aresta(g_linha, aresta);
             break;
           }
-          indice_outer++;
+          indice_outter++;
         }
       }
       j++;
     }
     std::cout << "\n";
   }
-
-  exit(0);
   return g_linha;
 }
 
