@@ -98,15 +98,24 @@ int busca_binaria_alterada(vector<int> &vetor_ordenado,
   return indice_retorno;
 }
 
+/// @brief Cria um grafo novo com uma lista de adjacencias vazia. Tempo: O(numero_vertices)
+/// @param numero_vertices
+/// @return Uma estrutura Grafo
 Grafo cria_grafo(int numero_vertices)
 {
   Grafo novo_grafo;
+  // garante que nao preciso ficar realocando o tamanho do vetor e jogando elementos para tras
+  novo_grafo.adjacencias.reserve(numero_vertices);
 
+  // atribuicao: O(1)
   novo_grafo.numero_vertices = numero_vertices;
 
+  // executa para cada vértice: O(n)
   for (auto v = 0; v < numero_vertices; v++)
   {
+    // atribuir: O(1)
     vector<int> adjacencia = {};
+    // inserir no final: O(1)
     novo_grafo.adjacencias.push_back(adjacencia);
   }
   return novo_grafo;
@@ -165,22 +174,29 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
   /*
    * numero de vertices de g' é k * v(g) + 2 * soma numero de graus(g) (2 * |E|)
    */
-  Grafo g_linha = cria_grafo(k * g.numero_vertices + 4 * g.numero_arestas);
+  auto n_g_linha = k * g.numero_vertices + 4 * g.numero_arestas;
+  // Tempo: O(k * g.numero_vertices + 4 * g.numero_arestas) = O(n)
+  Grafo g_linha = cria_grafo(n_g_linha);
 
   cout << "tamanho da lista de adjacencias: " << g_linha.adjacencias.size()
        << endl;
 
+  // atribuição: O(1)
   int soma_vizinhanca = 0;
   int indice_conversao;
 
-  for (int i = 0; i < (int)g.adjacencias.size(); i++)
+  // O(numero_vertices de g) = O(n)
+  for (int i = 0; i < (int)g.numero_vertices; i++)
   {
     // criar tabela de busca de vertices
+    // contas: O(1)
     indice_conversao = i * k + soma_vizinhanca;
     soma_vizinhanca += 2 * g.adjacencias[i].size();
+    // inserir no final: O(1)
     TABELA_INDICES_INICIAIS.push_back(indice_conversao);
   }
   cout << "ADJACENCIAS DE G" << endl;
+  // debug apenas, vou retirar
   imprime_lista_adjacencia(g.adjacencias);
   // preciso criar o grafo inflado (as arestas)
   /*
@@ -287,9 +303,11 @@ bool decide_emparelhamento_perfeito(const Emparelhamento &m, const Grafo &g)
 // algoritmo do artigo
 Grafo computa_k_fator_simples(const Grafo &g, const int &k)
 {
+  // declaracao O(1)
   Grafo f;
   Emparelhamento m;
 
+  // verifica uma propriedade, O(1)
   if (g.menor_grau < k)
   {
     cout << "Não existe " << k << "-fator no grafo." << g.menor_grau
@@ -297,6 +315,7 @@ Grafo computa_k_fator_simples(const Grafo &g, const int &k)
     exit(0);
   }
 
+  //
   Grafo g_linha = cria_grafo_inflado(g, k);
 
   // computa emparelhamento maximo M em g_linha
