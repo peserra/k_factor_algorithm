@@ -9,14 +9,15 @@
 /*
  * vou colocar using std namespace pra limpar um pouco o codigo
  */
+using namespace std;
 
 typedef struct Grafo
 {
   int numero_vertices = 0;
   int numero_arestas = 0;
   int menor_grau = 9999;
-  std::vector<int> graus_vertices = {};
-  std::vector<std::vector<int>> adjacencias = {};
+  vector<int> graus_vertices = {};
+  vector<vector<int>> adjacencias = {};
 } Grafo;
 
 typedef struct Aresta
@@ -27,7 +28,7 @@ typedef struct Aresta
 
 typedef struct Emparelhamento
 {
-  std::vector<Aresta> arestas = {};
+  vector<Aresta> arestas = {};
 } Emparelhamento;
 
 /*
@@ -40,10 +41,10 @@ typedef struct Emparelhamento
   Por exemplo, se o vértice 0 de G gera os vértices 0, 1, 2, 3, 4, 5 em G',
   então TABELA_INDICES_INICIAIS[0] = 0.
 */
-std::vector<int> TABELA_INDICES_INICIAIS;
+vector<int> TABELA_INDICES_INICIAIS;
 
 // caso precise depois (tirar caso contrario)
-int busca_binaria(std::vector<int> &vetor_ordenado, int valor_buscado)
+int busca_binaria(vector<int> &vetor_ordenado, int valor_buscado)
 {
 
   int esq = 0;
@@ -71,7 +72,7 @@ int busca_binaria(std::vector<int> &vetor_ordenado, int valor_buscado)
 }
 
 // para usar a TABELA_INDICES_INICIAIS
-int busca_binaria_alterada(std::vector<int> &vetor_ordenado,
+int busca_binaria_alterada(vector<int> &vetor_ordenado,
                            int valor_buscado)
 {
 
@@ -105,7 +106,7 @@ Grafo cria_grafo(int numero_vertices)
 
   for (auto v = 0; v < numero_vertices; v++)
   {
-    std::vector<int> adjacencia = {};
+    vector<int> adjacencia = {};
     novo_grafo.adjacencias.push_back(adjacencia);
   }
   return novo_grafo;
@@ -121,7 +122,7 @@ void adiciona_aresta(Grafo &grafo, Aresta &aresta)
 // cria lista de grau dos vertices de G e calcula o valor do menor grau de G
 void cria_lista_graus(Grafo &grafo)
 {
-  for (std::vector<int> adjacencia : grafo.adjacencias)
+  for (vector<int> adjacencia : grafo.adjacencias)
   {
     int grau_vertice = (int)adjacencia.size();
     grafo.graus_vertices.push_back(grau_vertice);
@@ -132,7 +133,7 @@ void cria_lista_graus(Grafo &grafo)
 }
 
 // encontrar indice correlacionado g <-> g'
-int encontra_indice(std::vector<int> &vetor_ordenado, int numero)
+int encontra_indice(vector<int> &vetor_ordenado, int numero)
 {
   if ((int)vetor_ordenado.size() == 0)
   {
@@ -141,21 +142,21 @@ int encontra_indice(std::vector<int> &vetor_ordenado, int numero)
   return busca_binaria_alterada(vetor_ordenado, numero);
 }
 
-void imprime_lista_ints(const std::vector<int> &lista)
+void imprime_lista_ints(const vector<int> &lista)
 {
   for (auto i : lista)
   {
-    std::cout << i << ", ";
+    cout << i << ", ";
   }
 }
 
-void imprime_lista_adjacencia(const std::vector<std::vector<int>> &adj)
+void imprime_lista_adjacencia(const vector<vector<int>> &adj)
 {
   for (size_t i = 0; i < adj.size(); ++i)
   {
-    std::cout << i << " : " << std::ends;
+    cout << i << " : " << ends;
     imprime_lista_ints(adj[i]);
-    std::cout << '\n';
+    cout << '\n';
   }
 }
 
@@ -166,8 +167,8 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
    */
   Grafo g_linha = cria_grafo(k * g.numero_vertices + 4 * g.numero_arestas);
 
-  std::cout << "tamanho da lista de adjacencias: " << g_linha.adjacencias.size()
-            << std::endl;
+  cout << "tamanho da lista de adjacencias: " << g_linha.adjacencias.size()
+       << endl;
 
   int soma_vizinhanca = 0;
   int indice_conversao;
@@ -179,7 +180,7 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
     soma_vizinhanca += 2 * g.adjacencias[i].size();
     TABELA_INDICES_INICIAIS.push_back(indice_conversao);
   }
-  std::cout << "ADJACENCIAS DE G" << std::endl;
+  cout << "ADJACENCIAS DE G" << endl;
   imprime_lista_adjacencia(g.adjacencias);
   // preciso criar o grafo inflado (as arestas)
   /*
@@ -257,7 +258,7 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
       }
       j++;
     }
-    std::cout << "\n";
+    cout << "\n";
   }
   return g_linha;
 }
@@ -291,8 +292,8 @@ Grafo computa_k_fator_simples(const Grafo &g, const int &k)
 
   if (g.menor_grau < k)
   {
-    std::cout << "Não existe " << k << "-fator no grafo." << g.menor_grau
-              << " < " << k << "." << std::endl;
+    cout << "Não existe " << k << "-fator no grafo." << g.menor_grau
+         << " < " << k << "." << endl;
     exit(0);
   }
 
@@ -304,9 +305,9 @@ Grafo computa_k_fator_simples(const Grafo &g, const int &k)
   // se M nao é perfeito, retorna null
   if (!decide_emparelhamento_perfeito(m, g_linha))
   {
-    std::cout << "Não existe " << k
-              << "-fator no grafo. Emparelhamento de g não é perfeito."
-              << std::endl;
+    cout << "Não existe " << k
+         << "-fator no grafo. Emparelhamento de g não é perfeito."
+         << endl;
     exit(0);
   }
 
@@ -322,25 +323,25 @@ Grafo computa_k_fator_simples(const Grafo &g, const int &k)
 int main()
 {
 
-  std::cout << "Insira o grafo abaixo (primeira linha: #vertices, linhas "
-               "seguintes: u v arestas."
-            << std::endl;
+  cout << "Insira o grafo abaixo (primeira linha: #vertices, linhas "
+          "seguintes: u v arestas."
+       << endl;
 
   // le entrada para montar o grafo
   int numero_vertices = 0;
-  std::string linha;
-  std::cin >> numero_vertices;
-  std::cin.ignore();
+  string linha;
+  cin >> numero_vertices;
+  cin.ignore();
   Grafo grafo = cria_grafo(numero_vertices);
 
   // leitura das linhas do terminal para criar as arestas
-  while (getline(std::cin, linha))
+  while (getline(cin, linha))
   {
     if (linha.empty())
       break;
 
     Aresta aresta;
-    std::stringstream stream(linha);
+    stringstream stream(linha);
     // extraindo vertices:
     stream >> aresta.u >> aresta.v;
     adiciona_aresta(grafo, aresta);
