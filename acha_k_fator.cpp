@@ -188,7 +188,7 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
   // O(numero_vertices de g) = O(n)
   for (int i = 0; i < (int)g.numero_vertices; i++)
   {
-    // criar tabela de busca de vertices
+    // criar tabela de indices iniciais para buscade busca de vertices
     // contas: O(1)
     indice_conversao = i * k + soma_vizinhanca;
     soma_vizinhanca += 2 * g.adjacencias[i].size();
