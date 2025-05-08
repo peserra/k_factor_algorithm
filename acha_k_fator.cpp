@@ -181,6 +181,7 @@ Grafo cria_grafo_inflado(const Grafo &g, const int &k)
   cout << "tamanho da lista de adjacencias: " << g_linha.adjacencias.size()
        << endl;
 
+  // transformar em funcao que recebe o grafo G
   // atribuição: O(1)
   int soma_vizinhanca = 0;
   int indice_conversao;
