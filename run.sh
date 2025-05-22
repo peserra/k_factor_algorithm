@@ -1,11 +1,8 @@
-
 #!/bin/bash
 
-# Caminho para a pasta do projeto
 PROJECT_DIR="$(dirname "$0")"
 BUILD_DIR="$PROJECT_DIR/build"
 
-# Navegar para o diretório do projeto
 cd "$PROJECT_DIR" || exit
 
 # Etapa 1: Configuração do CMake
@@ -26,4 +23,3 @@ if [ -f "$EXECUTABLE" ]; then
 else
     echo "Executable not found. Build failed."
 fi
-
