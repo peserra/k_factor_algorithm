@@ -14,14 +14,27 @@ public:
     int getNumeroVertices() const;
     int getNumeroArestas() const;
     int getMenorGrau() const;
+
+    // Retorna uma referência constante para a lista de adjacências
+    // Evita cópias desnecessárias para melhorar o desempenho
     const std::vector<std::vector<int>> &getAdjacencias() const;
+
+    // Retorna uma referência constante para os graus dos vértices
     const std::vector<int> &getGrauVertices() const;
+    // Retorna uma referência constante para lista de indices iniciais
     const std::vector<int> &getIndicesIniciais() const;
 
     // metodos
+    // adiciona uma uv aresta na lista de adjacencias
     void adicionaAresta(const int u, const int v);
+
+    // preenche a lista de graus.
     void criaListaGraus();
+
+    // 'infla' o grafo, seguindo o algoritmo.
     Grafo criaGrafoInflado(const int k);
+
+    // facilita a visualização do grafo no print
     std::string toString() const;
 
 private:
@@ -34,8 +47,13 @@ private:
     std::vector<std::vector<int>> adjacencias;
 
     // metodos
-    void preencheArestasGrafoInflado(Grafo &grafoInflado, const int k);
     void populaTabelaIndicesIniciais(const int k);
+
+    /*
+        popula a lista de adjacencias de um grafo inflado seguindo as regras estruturais de
+        sua criação segundo o algoritmo.
+    */
+    void preencheArestasGrafoInflado(Grafo &grafoInflado, const int k);
     void adicionaArestasCore(
         Grafo &grafoInflado,
         const int indiceInicialAtual,
@@ -49,9 +67,7 @@ private:
         Grafo &grafoInflado,
         const int ultimoIndiceInner,
         const int indiceAtual,
-        const int verticeAtual
-    );
-
+        const int verticeAtual);
 };
 
 #endif // GRAFO_HPP

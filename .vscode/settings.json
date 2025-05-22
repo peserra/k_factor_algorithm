@@ -68,7 +68,8 @@
         "ratio": "cpp",
         "sstream": "cpp",
         "stack": "cpp",
-        "bitset": "cpp"
+        "bitset": "cpp",
+        "complex": "cpp"
     },
     "C_Cpp.default.compilerPath": "/usr/lib/ccache/clang++-18"
 }
