@@ -1,5 +1,4 @@
 #include "headers/Grafo.hpp"
-#include <sstream>
 
 constexpr int MENOR_GRAU_INICIAL = 9999;
 // metodo construtor
@@ -151,6 +150,52 @@ void Grafo::populaTabelaIndicesIniciais(
         indiceConversao = i * k + somaVizinhanca;
         somaVizinhanca += 2 * grausVertices[i];
         indicesIniciais.push_back(indiceConversao);
+    }
+}
+void Grafo::Dfs(const int verticeInicial, std::vector<bool> &visitados)
+{
+    std::stack<int> pilha;
+    if (!visitados[verticeInicial])
+    {
+        pilha.push(verticeInicial);
+        visitados[verticeInicial] = true;
+    }
+    while (!pilha.empty())
+    {
+        int verticeAtual = pilha.top();
+        pilha.pop();
+        // processa
+        for (int i = adjacencias[verticeAtual].size() - 1; i >= 0; i--)
+        {
+            int vizinho = adjacencias[verticeAtual][i];
+            if (!visitados[vizinho])
+            {
+                visitados[vizinho] = true;
+                pilha.push(vizinho);
+            }
+        }
+    }
+}
+
+void Grafo::Bfs(const int verticeInicial, std::vector<bool> &visitados)
+{
+    std::queue<int> fila;
+    visitados[verticeInicial] = true;
+    fila.push(verticeInicial);
+    while (!fila.empty())
+    {
+        int primeiroFila = fila.front();
+        fila.pop();
+        // processa
+        for (int v : adjacencias[primeiroFila])
+        {
+            // marca nao visitado e adiciona
+            if (!visitados[v])
+            {
+                visitados[v] = true;
+                fila.push(v);
+            }
+        }
     }
 }
 
