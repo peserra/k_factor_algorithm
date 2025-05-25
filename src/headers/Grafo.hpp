@@ -3,8 +3,6 @@
 
 #include <vector>
 #include <string>
-#include <queue>
-#include <stack>
 
 class Grafo
 {
@@ -53,11 +51,6 @@ private:
         const int indiceAtual,
         const int verticeAtual
     );
-    // depth-first search iterativa
-    void Dfs(const int verticeInicial, std::vector<bool>& visitado);
-
-    // breadth-first search iterativa
-    void Bfs(const int verticeInicial, std::vector<bool>& visitado);
 
 };
 
