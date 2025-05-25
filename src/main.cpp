@@ -1,36 +1,46 @@
 #include <iostream>
 #include <sstream>
+#include <memory>
 #include "headers/Grafo.hpp"
 
-void computaKFatorSImples(const Grafo& grafo, const int k){
-
+void achaKFatorSimples(const Grafo& grafo, const int k)
+{
 }
-
 
 int main()
 {
     int k = 2;
 
-    std::cout
-        << "Cole abaixo  o grafo no formato correto (primeira linha: #vertices, demais: u v arestas.):" << std::endl;
+    std::cout << "Cole abaixo o grafo no formato correto (primeira linha: #vertices, demais: u v arestas.):" << std::endl;
+
     int numeroVertices = 0;
-    std::string linha;
     std::cin >> numeroVertices;
     std::cin.ignore();
 
-    auto grafo = new Grafo(numeroVertices);
-    while (getline(std::cin, linha))
+    Grafo grafo(numeroVertices);
+
+    std::string linha;
+    while (std::getline(std::cin, linha))
     {
-        if(linha.empty())
+        if (linha.empty())
             break;
-        int u;
-        int v;
-        std::stringstream stream(linha);
-        stream >> u >> v;
-        grafo->adicionaAresta(u, v);
 
+        std::istringstream stream(linha);
+        int u, v;
+        if (stream >> u >> v) // Parse the edge only if both u and v are valid
+        {
+            grafo.adicionaAresta(u, v);
+        }
+        else
+        {
+            std::cerr << "Erro: Formato de entrada da linha incorreto: " << linha << std::endl;
+            exit(1);
+        }
     }
-    grafo->criaListaGraus();
-    std::cout << grafo->toString() << std::endl;
 
+    grafo.criaListaGraus();
+    achaKFatorSimples(grafo, k);
+    std::cout << grafo.toString() << std::endl;
+
+    return 0;
 }

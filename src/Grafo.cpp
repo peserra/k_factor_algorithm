@@ -1,11 +1,12 @@
 #include "headers/Grafo.hpp"
 #include <sstream>
 
+constexpr int MENOR_GRAU_INICIAL = 9999;
 // metodo construtor
 Grafo::Grafo(int numeroVertices)
     : numeroVertices(numeroVertices),
       numeroArestas(0),
-      menorGrau(9999),
+      menorGrau(MENOR_GRAU_INICIAL),
       grausVertices(numeroVertices, 0),
       indicesIniciais(numeroVertices, 0),
       adjacencias(numeroVertices)
@@ -17,6 +18,31 @@ Grafo::Grafo(int numeroVertices)
     }
 }
 
+/* Getters */
+int Grafo::getNumeroVertices() const {
+    return numeroVertices;
+}
+
+int Grafo::getNumeroArestas() const {
+    return numeroArestas;
+}
+
+int Grafo::getMenorGrau() const {
+    return menorGrau;
+}
+
+const std::vector<std::vector<int>>& Grafo::getAdjacencias() const {
+    return adjacencias;
+}
+
+const std::vector<int>& Grafo::getGrauVertices() const {
+    return grausVertices;
+}
+
+const std::vector<int>& Grafo::getIndicesIniciais() const {
+    return indicesIniciais;
+}
+
 void Grafo::adicionaAresta(const int u, const int v)
 {
     adjacencias[u].push_back(v);
@@ -26,7 +52,7 @@ void Grafo::adicionaAresta(const int u, const int v)
 
 void Grafo::criaListaGraus()
 {
-    for (auto i = 0; i < numeroVertices; i++)
+    for (int i = 0; i < numeroVertices; i++)
     {
         int grau = adjacencias[i].size();
         grausVertices[i] = grau;
@@ -45,8 +71,10 @@ Grafo Grafo::criaGrafoInflado(const int k)
 
 void Grafo::preencheArestasGrafoInflado(Grafo &grafoInflado, const int k)
 {
+    // itera sobre os vértices do grafo original
     for (auto indiceVerticeAtual = 0; indiceVerticeAtual < numeroVertices; indiceVerticeAtual++)
     {
+        // calculo de indices para os vértices core, inner e outer do gadget
         int ultimoIndiceCore = indicesIniciais[indiceVerticeAtual] + k - 1;
         int ultimoIndiceInner = indicesIniciais[indiceVerticeAtual] + grausVertices[indiceVerticeAtual] + 1;
         int ultimoVerticeGadget = indicesIniciais[indiceVerticeAtual] + grausVertices[indiceVerticeAtual] * 2 + 1;
@@ -99,7 +127,7 @@ void Grafo::adicionaArestasOuter(
     const int indiceVerticeAtual)
 {
     int indiceRelativoOuter = indiceAtualGadget - ultimoIndiceInner - 1;
-    int verticeAdjacenteRelativo = adjacencias[indiceVerticeAtual].at(indiceRelativoOuter);
+    int verticeAdjacenteRelativo = adjacencias[indiceVerticeAtual][indiceRelativoOuter];
     int indiceOuterDestino = indicesIniciais[verticeAdjacenteRelativo] + grausVertices[verticeAdjacenteRelativo] + 2;
     int ultimoIndiceOuterDestino = indicesIniciais[verticeAdjacenteRelativo] + grausVertices[verticeAdjacenteRelativo] * 2 + 1;
     while (indiceOuterDestino <= ultimoIndiceOuterDestino)
@@ -118,7 +146,7 @@ void Grafo::populaTabelaIndicesIniciais(
 {
     int somaVizinhanca = 0;
     int indiceConversao = 0;
-    for (auto i = 0; i < numeroVertices; i++)
+    for (int i = 0; i < numeroVertices; i++)
     {
         indiceConversao = i * k + somaVizinhanca;
         somaVizinhanca += 2 * grausVertices[i];
@@ -126,24 +154,30 @@ void Grafo::populaTabelaIndicesIniciais(
     }
 }
 
-std::string Grafo::toString() const {
+std::string Grafo::toString() const
+{
     std::ostringstream oss;
 
     oss << "Grafo: " << numeroVertices << " vértices, " << numeroArestas
         << " arestas, menor grau: " << menorGrau << "\n";
 
     oss << "Graus dos vértices: [";
-    for (size_t i = 0; i < grausVertices.size(); ++i) {
+    for (size_t i = 0; i < grausVertices.size(); ++i)
+    {
         oss << grausVertices[i];
-        if (i + 1 < grausVertices.size()) oss << ", ";
+        if (i + 1 < grausVertices.size())
+            oss << ", ";
     }
     oss << "]\nAdjacências:\n";
 
-    for (size_t idx = 0; idx < adjacencias.size(); ++idx) {
+    for (size_t idx = 0; idx < adjacencias.size(); ++idx)
+    {
         oss << "Vértice " << idx << ": [";
-        for (size_t j = 0; j < adjacencias[idx].size(); ++j) {
+        for (size_t j = 0; j < adjacencias[idx].size(); ++j)
+        {
             oss << adjacencias[idx][j];
-            if (j + 1 < adjacencias[idx].size()) oss << ", ";
+            if (j + 1 < adjacencias[idx].size())
+                oss << ", ";
         }
         oss << "]\n";
     }
