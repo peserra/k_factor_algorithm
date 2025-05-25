@@ -6,10 +6,9 @@ void computaKFatorSImples(const Grafo& grafo, const int k){
 
 }
 
-
 int main()
 {
-    int k = 2;
+    const int k = 2;
 
     std::cout
         << "Cole abaixo  o grafo no formato correto (primeira linha: #vertices, demais: u v arestas.):" << std::endl;

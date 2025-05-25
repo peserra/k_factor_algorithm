@@ -126,24 +126,77 @@ void Grafo::populaTabelaIndicesIniciais(
     }
 }
 
-std::string Grafo::toString() const {
+void Grafo::Dfs(const int verticeInicial, std::vector<bool> &visitados)
+{
+    std::stack<int> pilha;
+    if (!visitados[verticeInicial])
+    {
+        pilha.push(verticeInicial);
+        visitados[verticeInicial] = true;
+    }
+    while (!pilha.empty())
+    {
+        int verticeAtual = pilha.top();
+        pilha.pop();
+        // processa
+        for (int i = adjacencias[verticeAtual].size() - 1; i >= 0; i--)
+        {
+            int vizinho = adjacencias[verticeAtual][i];
+            if (!visitados[vizinho])
+            {
+                visitados[vizinho] = true;
+                pilha.push(vizinho);
+            }
+        }
+    }
+}
+
+void Grafo::Bfs(const int verticeInicial, std::vector<bool> &visitados)
+{
+    std::queue<int> fila;
+    visitados[verticeInicial] = true;
+    fila.push(verticeInicial);
+    while (!fila.empty())
+    {
+        int primeiroFila = fila.front();
+        fila.pop();
+        // processa
+        for (int v : adjacencias[primeiroFila])
+        {
+            // marca nao visitado e adiciona
+            if (!visitados[v])
+            {
+                visitados[v] = true;
+                fila.push(v);
+            }
+        }
+    }
+}
+
+std::string Grafo::toString() const
+{
     std::ostringstream oss;
 
     oss << "Grafo: " << numeroVertices << " vértices, " << numeroArestas
         << " arestas, menor grau: " << menorGrau << "\n";
 
     oss << "Graus dos vértices: [";
-    for (size_t i = 0; i < grausVertices.size(); ++i) {
+    for (size_t i = 0; i < grausVertices.size(); ++i)
+    {
         oss << grausVertices[i];
-        if (i + 1 < grausVertices.size()) oss << ", ";
+        if (i + 1 < grausVertices.size())
+            oss << ", ";
     }
     oss << "]\nAdjacências:\n";
 
-    for (size_t idx = 0; idx < adjacencias.size(); ++idx) {
+    for (size_t idx = 0; idx < adjacencias.size(); ++idx)
+    {
         oss << "Vértice " << idx << ": [";
-        for (size_t j = 0; j < adjacencias[idx].size(); ++j) {
+        for (size_t j = 0; j < adjacencias[idx].size(); ++j)
+        {
             oss << adjacencias[idx][j];
-            if (j + 1 < adjacencias[idx].size()) oss << ", ";
+            if (j + 1 < adjacencias[idx].size())
+                oss << ", ";
         }
         oss << "]\n";
     }
