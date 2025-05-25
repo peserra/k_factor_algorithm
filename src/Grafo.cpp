@@ -82,15 +82,15 @@ void Grafo::preencheArestasGrafoInflado(Grafo &grafoInflado, const int k)
         {
             if (indiceAtualGadget <= ultimoIndiceCore)
             {
-                Grafo::adicionaArestasCore(grafoInflado, indiceAtualGadget, ultimoIndiceCore, ultimoIndiceInner);
+                this->adicionaArestasCore(grafoInflado, indiceAtualGadget, ultimoIndiceCore, ultimoIndiceInner);
             }
             else if (indiceAtualGadget <= ultimoIndiceInner)
             {
-                Grafo::adicionaArestasInner(grafoInflado, indiceAtualGadget, indiceVerticeAtual);
+                this->adicionaArestasInner(grafoInflado, indiceAtualGadget, indiceVerticeAtual);
             }
             else
             {
-                Grafo::adicionaArestasOuter(grafoInflado, ultimoIndiceInner, indiceAtualGadget, indiceVerticeAtual);
+                this->adicionaArestasOuter(grafoInflado, ultimoIndiceInner, indiceAtualGadget, indiceVerticeAtual);
             }
             indiceAtualGadget++;
         }
