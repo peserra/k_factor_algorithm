@@ -3,6 +3,9 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
+#include <queue>
+#include <stack>
 
 class Grafo
 {
@@ -68,6 +71,11 @@ private:
         const int ultimoIndiceInner,
         const int indiceAtual,
         const int verticeAtual);
+
+    //Depth-first search iterativa
+    void Dfs(const int verticeInicial, std::vector<bool> &visitados);
+    //Bradth-first search iterativa
+    void Bfs(const int verticeInicial, std::vector<bool> &visitados);
 };
 
 #endif // GRAFO_HPP
