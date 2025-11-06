@@ -9,7 +9,7 @@ void achaKFatorSimples(const Grafo& grafo, const int k)
 
 int main()
 {
-    int k = 2;
+    int k = 2; // fator que se deseja encontrar no grafo
 
     std::cout << "Cole abaixo o grafo no formato correto (primeira linha: #vertices, demais: u v arestas.):" << std::endl;
 
@@ -27,7 +27,7 @@ int main()
 
         std::istringstream stream(linha);
         int u, v;
-        if (stream >> u >> v) // Parse the edge only if both u and v are valid
+        if (stream >> u >> v) 
         {
             grafo.adicionaAresta(u, v);
         }

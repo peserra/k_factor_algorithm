@@ -8,44 +8,82 @@ Grafo::Grafo(int numeroVertices)
       menorGrau(MENOR_GRAU_INICIAL),
       grausVertices(numeroVertices, 0),
       indicesIniciais(numeroVertices, 0),
-      adjacencias(numeroVertices)
+      listaAdjacencias(numeroVertices),
+      matrizAdjacencias(numeroVertices, vector<bool>(numeroVertices, false))
 {
     // Reserva espaço para as listas de adjacência
     for (int i = 0; i < numeroVertices; i++)
     {
-        adjacencias[i] = std::vector<int>();
+        listaAdjacencias[i] = vector<int>();
     }
 }
 
 /* Getters */
-int Grafo::getNumeroVertices() const {
+int Grafo::getNumeroVertices() const
+{
     return numeroVertices;
 }
 
-int Grafo::getNumeroArestas() const {
+int Grafo::getNumeroArestas() const
+{
     return numeroArestas;
 }
 
-int Grafo::getMenorGrau() const {
+int Grafo::getMenorGrau() const
+{
     return menorGrau;
 }
 
-const std::vector<std::vector<int>>& Grafo::getAdjacencias() const {
-    return adjacencias;
+const vector<vector<int>> &Grafo::getListaAdj() const
+{
+    return listaAdjacencias;
 }
 
-const std::vector<int>& Grafo::getGrauVertices() const {
+const vector<vector<bool>> &Grafo::getMatrizAdj() const
+{
+    return matrizAdjacencias;
+}
+
+int Grafo::getIndiceAresta(int u, int v) const
+{
+    if (u > numeroArestas || v > numeroArestas)
+        throw "Error: vertice nao existe";
+    if (indiceArestas[u][v] == -1)
+        throw "Error: aresta não existe";
+    return indiceArestas[u][v];
+}
+
+const vector<int> &Grafo::getAdjacenciasVertice(int v) const
+{
+    if (v > numeroVertices)
+        throw "Erro: o vértice nao existe";
+    return listaAdjacencias[v];
+}
+
+const vector<int> &Grafo::getGrauVertices() const
+{
     return grausVertices;
 }
 
-const std::vector<int>& Grafo::getIndicesIniciais() const {
+const vector<int> &Grafo::getIndicesIniciais() const
+{
     return indicesIniciais;
 }
 
 void Grafo::adicionaAresta(const int u, const int v)
 {
-    adjacencias[u].push_back(v);
-    adjacencias[v].push_back(u);
+    if (u > numeroVertices || v > numeroVertices)
+        throw "Erro: vértice nao existe.";
+
+    if (matrizAdjacencias[u][v])
+        return;
+    matrizAdjacencias[u][v] = matrizAdjacencias[v][u] = true;
+
+    listaAdjacencias[u].push_back(v);
+    listaAdjacencias[v].push_back(u);
+
+    arestas.push_back(pair<int, int>(u, v));
+    indiceArestas[u][v] = indiceArestas[v][u] = numeroArestas;
     numeroArestas++;
 }
 
@@ -53,7 +91,7 @@ void Grafo::criaListaGraus()
 {
     for (int i = 0; i < numeroVertices; i++)
     {
-        int grau = adjacencias[i].size();
+        int grau = listaAdjacencias[i].size();
         grausVertices[i] = grau;
         menorGrau = grau < menorGrau ? grau : menorGrau;
     }
@@ -126,12 +164,12 @@ void Grafo::adicionaArestasOuter(
     const int indiceVerticeAtual)
 {
     int indiceRelativoOuter = indiceAtualGadget - ultimoIndiceInner - 1;
-    int verticeAdjacenteRelativo = adjacencias[indiceVerticeAtual][indiceRelativoOuter];
+    int verticeAdjacenteRelativo = listaAdjacencias[indiceVerticeAtual][indiceRelativoOuter];
     int indiceOuterDestino = indicesIniciais[verticeAdjacenteRelativo] + grausVertices[verticeAdjacenteRelativo] + 2;
     int ultimoIndiceOuterDestino = indicesIniciais[verticeAdjacenteRelativo] + grausVertices[verticeAdjacenteRelativo] * 2 + 1;
     while (indiceOuterDestino <= ultimoIndiceOuterDestino)
     {
-        if (grafoInflado.adjacencias[indiceOuterDestino].size() == 0)
+        if (grafoInflado.listaAdjacencias[indiceOuterDestino].size() == 0)
         {
             grafoInflado.adicionaAresta(indiceAtualGadget, indiceOuterDestino);
             break;
@@ -152,9 +190,9 @@ void Grafo::populaTabelaIndicesIniciais(
         indicesIniciais.push_back(indiceConversao);
     }
 }
-void Grafo::Dfs(const int verticeInicial, std::vector<bool> &visitados)
+void Grafo::Dfs(const int verticeInicial, vector<bool> &visitados)
 {
-    std::stack<int> pilha;
+    stack<int> pilha;
     if (!visitados[verticeInicial])
     {
         pilha.push(verticeInicial);
@@ -165,9 +203,9 @@ void Grafo::Dfs(const int verticeInicial, std::vector<bool> &visitados)
         int verticeAtual = pilha.top();
         pilha.pop();
         // processa
-        for (int i = adjacencias[verticeAtual].size() - 1; i >= 0; i--)
+        for (int i = listaAdjacencias[verticeAtual].size() - 1; i >= 0; i--)
         {
-            int vizinho = adjacencias[verticeAtual][i];
+            int vizinho = listaAdjacencias[verticeAtual][i];
             if (!visitados[vizinho])
             {
                 visitados[vizinho] = true;
@@ -177,9 +215,9 @@ void Grafo::Dfs(const int verticeInicial, std::vector<bool> &visitados)
     }
 }
 
-void Grafo::Bfs(const int verticeInicial, std::vector<bool> &visitados)
+void Grafo::Bfs(const int verticeInicial, vector<bool> &visitados)
 {
-    std::queue<int> fila;
+    queue<int> fila;
     visitados[verticeInicial] = true;
     fila.push(verticeInicial);
     while (!fila.empty())
@@ -187,7 +225,7 @@ void Grafo::Bfs(const int verticeInicial, std::vector<bool> &visitados)
         int primeiroFila = fila.front();
         fila.pop();
         // processa
-        for (int v : adjacencias[primeiroFila])
+        for (int v : listaAdjacencias[primeiroFila])
         {
             // marca nao visitado e adiciona
             if (!visitados[v])
@@ -199,9 +237,9 @@ void Grafo::Bfs(const int verticeInicial, std::vector<bool> &visitados)
     }
 }
 
-std::string Grafo::toString() const
+string Grafo::toString() const
 {
-    std::ostringstream oss;
+    ostringstream oss;
 
     oss << "Grafo: " << numeroVertices << " vértices, " << numeroArestas
         << " arestas, menor grau: " << menorGrau << "\n";
@@ -215,13 +253,13 @@ std::string Grafo::toString() const
     }
     oss << "]\nAdjacências:\n";
 
-    for (size_t idx = 0; idx < adjacencias.size(); ++idx)
+    for (size_t idx = 0; idx < listaAdjacencias.size(); ++idx)
     {
         oss << "Vértice " << idx << ": [";
-        for (size_t j = 0; j < adjacencias[idx].size(); ++j)
+        for (size_t j = 0; j < listaAdjacencias[idx].size(); ++j)
         {
-            oss << adjacencias[idx][j];
-            if (j + 1 < adjacencias[idx].size())
+            oss << listaAdjacencias[idx][j];
+            if (j + 1 < listaAdjacencias[idx].size())
                 oss << ", ";
         }
         oss << "]\n";
