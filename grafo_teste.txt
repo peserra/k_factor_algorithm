@@ -5,3 +5,10 @@
 2 3
 3 4
 4 0
+
+
+
+exemplo do algoritmo original matching:
+#vertices n
+#arestas m
+m linhas no formato "u v"
