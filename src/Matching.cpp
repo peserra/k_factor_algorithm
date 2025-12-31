@@ -1,6 +1,8 @@
-#include "Matching.h"
+#include "headers/Matching.hpp"
+#include "headers/BinaryHeap.hpp"
+#include "headers/Globals.h"
 
-Matching::Matching(const Graph &G)
+Matching::Matching(const GrafoAdapter &G)
     : G(G), outer(2 * G.GetNumVertices()), deep(2 * G.GetNumVertices()),
       shallow(2 * G.GetNumVertices()), tip(2 * G.GetNumVertices()),
       active(2 * G.GetNumVertices()), type(2 * G.GetNumVertices()),
