@@ -3,10 +3,12 @@
 #include <vector>
 #include "Grafo.hpp"
 
-class Emparelhamento {
+class Emparelhamento
+{
 public:
     // para construir um emparelhamento, preciso de um grafo
-    Emparelhamento(const Grafo& grafo) {
+    Emparelhamento(const Grafo &grafo)
+    {
         arestasEmparelhadas.reserve(grafo.getNumeroVertices());
     }
 

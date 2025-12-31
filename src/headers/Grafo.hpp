@@ -57,7 +57,7 @@ private:
     int numeroVertices;
     int numeroArestas;
     int menorGrau;
-    vector<pair<int,int>> arestas;
+    vector<pair<int, int>> arestas;
     vector<vector<int>> indiceArestas;
     vector<int> grausVertices;
     vector<int> indicesIniciais;
@@ -72,7 +72,7 @@ private:
         sua criação segundo o algoritmo.
     */
     void preencheArestasGrafoInflado(
-        Grafo &grafoInflado, 
+        Grafo &grafoInflado,
         const int k);
 
     void adicionaArestasCore(
