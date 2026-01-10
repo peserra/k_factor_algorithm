@@ -1,18 +1,16 @@
 #ifndef GRAFO_HPP
 #define GRAFO_HPP
-
-#include <vector>
-#include <string>
-#include <sstream>
-#include <queue>
-#include <stack>
 using namespace std;
+
+#include <sstream>
+#include <stack>
+#include <string>
+#include <vector>
 class Grafo
 {
 public:
     // Construtor
     Grafo(int numeroVertices);
-
     // getters
     int getNumeroVertices() const;
     int getNumeroArestas() const;
@@ -47,7 +45,7 @@ public:
     void criaListaGraus();
 
     // 'infla' o grafo, seguindo o algoritmo.
-    Grafo criaGrafoInflado(const int k);
+    Grafo criaGrafoInflado(const int k) const;
 
     // facilita a visualização do grafo no print
     string toString() const;
@@ -68,29 +66,20 @@ private:
     void populaTabelaIndicesIniciais(const int k);
 
     /*
-        popula a lista de adjacencias de um grafo inflado seguindo as regras estruturais de
-        sua criação segundo o algoritmo.
+        popula a lista de adjacencias de um grafo inflado seguindo as regras
+       estruturais de sua criação segundo o algoritmo.
     */
-    void preencheArestasGrafoInflado(
-        Grafo &grafoInflado,
-        const int k);
+    void preencheArestasGrafoInflado(Grafo &grafoInflado, const int k) const;
 
-    void adicionaArestasCore(
-        Grafo &grafoInflado,
-        const int indiceInicialAtual,
-        const int ultimoIndiceCore,
-        const int ultimoIndiceInner);
+    void adicionaArestasCore(Grafo &grafoInflado, const int indiceInicialAtual,
+                             const int ultimoIndiceCore,
+                             const int ultimoIndiceInner) const;
 
-    void adicionaArestasInner(
-        Grafo &grafoInflado,
-        const int indiceAtual,
-        const int verticeAtual);
+    void adicionaArestasInner(Grafo &grafoInflado, const int indiceAtual,
+                              const int verticeAtual) const;
 
-    void adicionaArestasOuter(
-        Grafo &grafoInflado,
-        const int ultimoIndiceInner,
-        const int indiceAtual,
-        const int verticeAtual);
+    void adicionaArestasOuter(Grafo &grafoInflado, const int ultimoIndiceInner,
+                              const int indiceAtual, const int verticeAtual) const;
 
     // Depth-first search iterativa
     void Dfs(const int verticeInicial, vector<bool> &visitados);

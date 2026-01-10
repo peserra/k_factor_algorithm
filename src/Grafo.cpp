@@ -97,7 +97,7 @@ void Grafo::criaListaGraus()
     }
 }
 
-Grafo Grafo::criaGrafoInflado(const int k)
+Grafo Grafo::criaGrafoInflado(const int k) const
 {
     int numeroVerticesGrafoInflado = k * numeroVertices + 4 * numeroArestas;
     Grafo grafoInflado(numeroVerticesGrafoInflado);
@@ -106,7 +106,7 @@ Grafo Grafo::criaGrafoInflado(const int k)
     return grafoInflado;
 }
 
-void Grafo::preencheArestasGrafoInflado(Grafo &grafoInflado, const int k)
+void Grafo::preencheArestasGrafoInflado(Grafo &grafoInflado, const int k) const
 {
     // itera sobre os vértices do grafo original
     for (auto indiceVerticeAtual = 0; indiceVerticeAtual < numeroVertices; indiceVerticeAtual++)
@@ -139,7 +139,7 @@ void Grafo::adicionaArestasCore(
     Grafo &grafoInflado,
     const int indiceAtualGadget,
     const int ultimoIndiceCore,
-    const int ultimoIndiceInner)
+    const int ultimoIndiceInner) const
 {
     int indiceVerticeInner = ultimoIndiceCore + 1;
     while (indiceVerticeInner <= ultimoIndiceInner)
@@ -152,7 +152,7 @@ void Grafo::adicionaArestasCore(
 void Grafo::adicionaArestasInner(
     Grafo &grafoInflado,
     const int indiceAtualGadget,
-    const int indiceVerticeAtual)
+    const int indiceVerticeAtual) const
 {
     grafoInflado.adicionaAresta(indiceAtualGadget, indiceAtualGadget + grausVertices[indiceVerticeAtual]);
 }
@@ -161,7 +161,7 @@ void Grafo::adicionaArestasOuter(
     Grafo &grafoInflado,
     const int ultimoIndiceInner,
     const int indiceAtualGadget,
-    const int indiceVerticeAtual)
+    const int indiceVerticeAtual) const
 {
     int indiceRelativoOuter = indiceAtualGadget - ultimoIndiceInner - 1;
     int verticeAdjacenteRelativo = listaAdjacencias[indiceVerticeAtual][indiceRelativoOuter];
@@ -188,52 +188,6 @@ void Grafo::populaTabelaIndicesIniciais(
         indiceConversao = i * k + somaVizinhanca;
         somaVizinhanca += 2 * grausVertices[i];
         indicesIniciais.push_back(indiceConversao);
-    }
-}
-void Grafo::Dfs(const int verticeInicial, vector<bool> &visitados)
-{
-    stack<int> pilha;
-    if (!visitados[verticeInicial])
-    {
-        pilha.push(verticeInicial);
-        visitados[verticeInicial] = true;
-    }
-    while (!pilha.empty())
-    {
-        int verticeAtual = pilha.top();
-        pilha.pop();
-        // processa
-        for (int i = listaAdjacencias[verticeAtual].size() - 1; i >= 0; i--)
-        {
-            int vizinho = listaAdjacencias[verticeAtual][i];
-            if (!visitados[vizinho])
-            {
-                visitados[vizinho] = true;
-                pilha.push(vizinho);
-            }
-        }
-    }
-}
-
-void Grafo::Bfs(const int verticeInicial, vector<bool> &visitados)
-{
-    queue<int> fila;
-    visitados[verticeInicial] = true;
-    fila.push(verticeInicial);
-    while (!fila.empty())
-    {
-        int primeiroFila = fila.front();
-        fila.pop();
-        // processa
-        for (int v : listaAdjacencias[primeiroFila])
-        {
-            // marca nao visitado e adiciona
-            if (!visitados[v])
-            {
-                visitados[v] = true;
-                fila.push(v);
-            }
-        }
     }
 }
 

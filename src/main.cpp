@@ -2,7 +2,29 @@
 #include <iostream>
 #include <sstream>
 
-void achaKFatorSimples(const Grafo &grafo, const int k) {}
+void printErrorMessage(const int k, string errorMessage)
+{
+    cout << "Não existe " << k << "-fator no grafo." << "\n"
+         << errorMessage << endl;
+}
+
+void achaKFatorSimples(const Grafo &grafo, const int k)
+{
+    // se g tiver vertice com grau menor que k, falha
+    if (grafo.getMenorGrau() < k)
+    {
+        auto errorMessage = grafo.getMenorGrau() + "<" + k;
+        printErrorMessage(k, errorMessage);
+        exit(-1);
+    }
+    // cria grafo inflado g'
+    Grafo g_linha = grafo.criaGrafoInflado(k); // preciso criar o adapter disso ****
+    // computa um emparelhamento máximo M* de g'
+    // se M* não for perfeito, retorna erro
+    // inicie F como um grafo com todos os vértices de g mas sem arestas
+    // adicione a F todas as arestas de g que correspondem as arestas outer de M em F
+    // retorne F
+}
 
 int main()
 {
