@@ -1,4 +1,5 @@
-#include "BinaryHeap.h"
+#include "headers/BinaryHeap.hpp"
+#include "headers/Globals.h"
 
 void BinaryHeap::Clear()
 {
