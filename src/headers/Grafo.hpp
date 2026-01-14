@@ -3,7 +3,6 @@
 using namespace std;
 
 #include <sstream>
-#include <stack>
 #include <string>
 #include <vector>
 class Grafo

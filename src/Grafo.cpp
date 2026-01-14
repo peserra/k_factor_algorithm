@@ -53,6 +53,13 @@ int Grafo::getIndiceAresta(int u, int v) const
     return indiceArestas[u][v];
 }
 
+pair<int, int> Grafo::getAresta(int indiceAresta) const 
+{
+    if (indiceAresta < (int)arestas.size())
+        throw "Erro: aresta não existe";
+    return arestas[indiceAresta];
+}
+
 const vector<int> &Grafo::getAdjacenciasVertice(int v) const
 {
     if (v > numeroVertices)
