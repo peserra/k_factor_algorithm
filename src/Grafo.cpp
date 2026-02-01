@@ -9,7 +9,8 @@ Grafo::Grafo(int numeroVertices)
       grausVertices(numeroVertices, 0),
       indicesIniciais(numeroVertices, 0),
       listaAdjacencias(numeroVertices),
-      matrizAdjacencias(numeroVertices, vector<bool>(numeroVertices, false))
+      matrizAdjacencias(numeroVertices, vector<bool>(numeroVertices, false)),
+      indiceArestas(numeroVertices, vector<int>(numeroVertices, -1))
 {
     // Reserva espaço para as listas de adjacência
     for (int i = 0; i < numeroVertices; i++)
@@ -46,23 +47,23 @@ const vector<vector<bool>> &Grafo::getMatrizAdj() const
 
 int Grafo::getIndiceAresta(int u, int v) const
 {
-    if (u > numeroArestas || v > numeroArestas)
+    if (u < 0 || v < 0 || u >= numeroVertices || v >= numeroVertices)
         throw "Error: vertice nao existe";
     if (indiceArestas[u][v] == -1)
         throw "Error: aresta não existe";
     return indiceArestas[u][v];
 }
 
-pair<int, int> Grafo::getAresta(int indiceAresta) const 
+pair<int, int> Grafo::getAresta(int indiceAresta) const
 {
-    if (indiceAresta < (int)arestas.size())
+    if (indiceAresta < 0 || indiceAresta >= (int)arestas.size())
         throw "Erro: aresta não existe";
     return arestas[indiceAresta];
 }
 
 const vector<int> &Grafo::getAdjacenciasVertice(int v) const
 {
-    if (v > numeroVertices)
+    if (v < 0 || v >= numeroVertices)
         throw "Erro: o vértice nao existe";
     return listaAdjacencias[v];
 }
@@ -79,7 +80,7 @@ const vector<int> &Grafo::getIndicesIniciais() const
 
 void Grafo::adicionaAresta(const int u, const int v)
 {
-    if (u > numeroVertices || v > numeroVertices)
+    if (u < 0 || v < 0 || u >= numeroVertices || v >= numeroVertices)
         throw "Erro: vértice nao existe.";
 
     if (matrizAdjacencias[u][v])
@@ -194,7 +195,7 @@ void Grafo::populaTabelaIndicesIniciais(
     {
         indiceConversao = i * k + somaVizinhanca;
         somaVizinhanca += 2 * grausVertices[i];
-        indicesIniciais.push_back(indiceConversao);
+        indicesIniciais[i] = indiceConversao;
     }
 }
 
