@@ -80,6 +80,5 @@ int main()
     grafo.criaListaGraus();
     std::cout << grafo.toString() << std::endl;
     achaKFatorSimples(grafo, k);
-
     return 0;
 }
