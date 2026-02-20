@@ -5,6 +5,8 @@ using namespace std;
 #include <sstream>
 #include <string>
 #include <vector>
+#include <iostream>
+#include <print>
 class Grafo
 {
 public:
@@ -44,7 +46,7 @@ public:
     void criaListaGraus();
 
     // 'infla' o grafo, seguindo o algoritmo.
-    Grafo criaGrafoInflado(const int k) const;
+    Grafo criaGrafoInflado(const int k);
 
     // facilita a visualização do grafo no print
     string toString() const;
@@ -54,14 +56,15 @@ private:
     int numeroVertices;
     int numeroArestas;
     int menorGrau;
-    vector<pair<int, int>> arestas;
-    vector<vector<int>> indiceArestas;
     vector<int> grausVertices;
     vector<int> indicesIniciais;
     vector<vector<int>> listaAdjacencias;
     vector<vector<bool>> matrizAdjacencias;
+    vector<vector<int>> indiceArestas;
+    vector<pair<int, int>> arestas;
 
     // metodos
+
     void populaTabelaIndicesIniciais(const int k);
 
     /*

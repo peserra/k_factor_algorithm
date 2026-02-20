@@ -105,9 +105,11 @@ void Grafo::criaListaGraus()
     }
 }
 
-Grafo Grafo::criaGrafoInflado(const int k) const
+Grafo Grafo::criaGrafoInflado(const int k)
 {
     int numeroVerticesGrafoInflado = k * numeroVertices + 4 * numeroArestas;
+    populaTabelaIndicesIniciais(k);
+    println("indices iniciais: {}", indicesIniciais);
     Grafo grafoInflado(numeroVerticesGrafoInflado);
     preencheArestasGrafoInflado(grafoInflado, k);
     grafoInflado.criaListaGraus();
@@ -117,13 +119,14 @@ Grafo Grafo::criaGrafoInflado(const int k) const
 void Grafo::preencheArestasGrafoInflado(Grafo &grafoInflado, const int k) const
 {
     // itera sobre os vértices do grafo original
-    for (auto indiceVerticeAtual = 0; indiceVerticeAtual < numeroVertices; indiceVerticeAtual++)
+    for (auto indiceVerticeAtual = 0; indiceVerticeAtual < numeroVertices; ++indiceVerticeAtual)
     {
         // calculo de indices para os vértices core, inner e outer do gadget
         int ultimoIndiceCore = indicesIniciais[indiceVerticeAtual] + k - 1;
         int ultimoIndiceInner = indicesIniciais[indiceVerticeAtual] + grausVertices[indiceVerticeAtual] + 1;
         int ultimoVerticeGadget = indicesIniciais[indiceVerticeAtual] + grausVertices[indiceVerticeAtual] * 2 + 1;
         int indiceAtualGadget = indicesIniciais[indiceVerticeAtual];
+
         while (indiceAtualGadget <= ultimoVerticeGadget)
         {
             if (indiceAtualGadget <= ultimoIndiceCore)
@@ -191,7 +194,7 @@ void Grafo::populaTabelaIndicesIniciais(
 {
     int somaVizinhanca = 0;
     int indiceConversao = 0;
-    for (int i = 0; i < numeroVertices; i++)
+    for (int i = 0; i < numeroVertices; ++i)
     {
         indiceConversao = i * k + somaVizinhanca;
         somaVizinhanca += 2 * grausVertices[i];

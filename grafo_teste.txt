@@ -6,8 +6,59 @@
 3 4
 4 0
 
+gera grafo inflado:
+
+v  core  |   inner  |  outer   |
+0: 0 1   | 2 3 4    | 5 6 7    |
+1: 8 9   |  10 11   | 12 13    |
+2: 14 15 |  16 17   | 18 19    |
+3: 20 21 | 22 23 24 | 25 26 27 |
+4: 28 29 |  30 31   |  32  33  |
 
 
+com a seguinte lista de adjacencia de suas arestas
+(core, inner, outer)
+
+Vértice 0: [2, 3, 4]
+Vértice 1: [2, 3, 4]
+Vértice 2: [0, 1, 5]
+Vértice 3: [0, 1, 6]
+Vértice 4: [0, 1, 7]
+Vértice 5: [2, 12]
+Vértice 6: [3, 18]
+Vértice 7: [4, 32]
+Vértice 8: [10, 11]
+Vértice 9: [10, 11]
+Vértice 10: [8, 9, 12]
+Vértice 11: [8, 9, 13]
+Vértice 12: [5, 10]
+Vértice 13: [11, 25]
+Vértice 14: [16, 17]
+Vértice 15: [16, 17]
+Vértice 16: [14, 15, 18]
+Vértice 17: [14, 15, 19]
+Vértice 18: [6, 16]
+Vértice 19: [17, 26]
+Vértice 20: [22, 23, 24]
+Vértice 21: [22, 23, 24]
+Vértice 22: [20, 21, 25]
+Vértice 23: [20, 21, 26]
+Vértice 24: [20, 21, 27]
+Vértice 25: [13, 22]
+Vértice 26: [19, 23]
+Vértice 27: [24, 33]
+Vértice 28: [30, 31]
+Vértice 29: [30, 31]
+Vértice 30: [28, 29, 32]
+Vértice 31: [28, 29, 33]
+Vértice 32: [7, 30]
+Vértice 33: [27, 31]
+
+
+
+
+
+// teste emparelhamento apenas
 6
 0 1
 0 2

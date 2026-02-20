@@ -11,7 +11,7 @@ void printErrorMessage(const int k, const string &errorMessage)
          << errorMessage << endl;
 }
 
-void achaKFatorSimples(const Grafo &grafo, const int k)
+void achaKFatorSimples(Grafo &grafo, const int k)
 {
     // se g tiver vertice com grau menor que k, falha
     if (grafo.getMenorGrau() < k)
@@ -20,22 +20,24 @@ void achaKFatorSimples(const Grafo &grafo, const int k)
         printErrorMessage(k, errorMessage);
         exit(-1);
     }
-    GrafoAdapter Adapter(grafo);
-    Matching M(Adapter);
-    list<int> matching;
-    matching = M.SolveMaximumMatching();
-
-    cout << "Number of edges in the maximum matching: " << matching.size() << endl;
-    cout << "Edges in the matching:" << endl;
-    for (list<int>::iterator it = matching.begin(); it != matching.end(); it++)
-    {
-        pair<int, int> e = Adapter.GetEdge(*it);
-
-        cout << e.first << " " << e.second << endl;
-    }
-
     // cria grafo inflado g'
-    // Grafo g_linha = grafo.criaGrafoInflado(k); // preciso criar o adapter disso ****
+    Grafo g_linha = grafo.criaGrafoInflado(k);
+    cout << g_linha.toString() << endl;
+
+    // GrafoAdapter Adapter(grafo);
+    // Matching M(Adapter);
+    // list<int> matching;
+    // matching = M.SolveMaximumMatching();
+
+    // cout << "Number of edges in the maximum matching: " << matching.size() << endl;
+    // cout << "Edges in the matching:" << endl;
+    // for (list<int>::iterator it = matching.begin(); it != matching.end(); it++)
+    // {
+    //     pair<int, int> e = Adapter.GetEdge(*it);
+
+    //     cout << e.first << " " << e.second << endl;
+    // }
+
     // computa um emparelhamento máximo M* de g'
     // se M* não for perfeito, retorna erro
     // inicie F como um grafo com todos os vértices de g mas sem arestas
@@ -45,7 +47,7 @@ void achaKFatorSimples(const Grafo &grafo, const int k)
 
 int main()
 {
-    int k = 1; // fator que se deseja encontrar no grafo
+    int k = 2; // fator que se deseja encontrar no grafo
 
     std::cout << "Cole abaixo o grafo no formato correto (primeira linha: "
                  "#vertices, demais: u v arestas.):"
