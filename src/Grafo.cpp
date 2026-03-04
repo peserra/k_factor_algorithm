@@ -78,6 +78,10 @@ const vector<int> &Grafo::getIndicesIniciais() const
     return indicesIniciais;
 }
 
+/*
+estrategia para melhorar o tempo: passar a matriz de adj e o indiceArestas
+para a classe Adapter, visto que só o algoritmo de matching usa essas estruturas
+*/
 void Grafo::adicionaAresta(const int u, const int v)
 {
     if (u < 0 || v < 0 || u >= numeroVertices || v >= numeroVertices)
@@ -109,7 +113,6 @@ Grafo Grafo::criaGrafoInflado(const int k)
 {
     int numeroVerticesGrafoInflado = k * numeroVertices + 4 * numeroArestas;
     populaTabelaIndicesIniciais(k);
-    println("indices iniciais: {}", indicesIniciais);
     Grafo grafoInflado(numeroVerticesGrafoInflado);
     preencheArestasGrafoInflado(grafoInflado, k);
     grafoInflado.criaListaGraus();
@@ -174,14 +177,20 @@ void Grafo::adicionaArestasOuter(
     const int indiceAtualGadget,
     const int indiceVerticeAtual) const
 {
+    // calcula em qual vértice outer estou (primeiro, segundo, ...)
     int indiceRelativoOuter = indiceAtualGadget - ultimoIndiceInner - 1;
+    // pega a adjacência no indice relativo do vértice atual
     int verticeAdjacenteRelativo = listaAdjacencias[indiceVerticeAtual][indiceRelativoOuter];
+    // pega valor do primeiro indice outer do vértice de destino
     int indiceOuterDestino = indicesIniciais[verticeAdjacenteRelativo] + grausVertices[verticeAdjacenteRelativo] + 2;
+    // pega o valor do ultimo indice outer no vértice de destino
     int ultimoIndiceOuterDestino = indicesIniciais[verticeAdjacenteRelativo] + grausVertices[verticeAdjacenteRelativo] * 2 + 1;
+    // procura pelo vértice outer do destino que não tem nenhuma adjacencia
     while (indiceOuterDestino <= ultimoIndiceOuterDestino)
     {
         if (grafoInflado.listaAdjacencias[indiceOuterDestino].size() == 0)
         {
+            // cria aresta entre vértice do gadget atual e vértice outer do destino encontrado
             grafoInflado.adicionaAresta(indiceAtualGadget, indiceOuterDestino);
             break;
         }

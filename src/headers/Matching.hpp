@@ -28,6 +28,8 @@ public:
     // Returns a list with the indices of the edges in the matching
     list<int> SolveMaximumMatching();
 
+    bool perfect;
+
 private:
     // Grows an alternating forest
     void Grow();
@@ -93,8 +95,6 @@ private:
     vector<int> mate;     // mate[v] gives the mate of v
 
     int m, n;
-
-    bool perfect;
 
     list<int> forestList;
     vector<int> visited;

@@ -24,10 +24,10 @@ void achaKFatorSimples(Grafo &grafo, const int k)
     Grafo g_linha = grafo.criaGrafoInflado(k);
     cout << g_linha.toString() << endl;
 
-    // GrafoAdapter Adapter(grafo);
-    // Matching M(Adapter);
-    // list<int> matching;
-    // matching = M.SolveMaximumMatching();
+    GrafoAdapter Adapter(grafo);
+    Matching M(Adapter);
+    list<int> matching;
+    matching = M.SolveMaximumMatching();
 
     // cout << "Number of edges in the maximum matching: " << matching.size() << endl;
     // cout << "Edges in the matching:" << endl;
@@ -40,7 +40,15 @@ void achaKFatorSimples(Grafo &grafo, const int k)
 
     // computa um emparelhamento máximo M* de g'
     // se M* não for perfeito, retorna erro
+    if (!M.perfect)
+    {
+        auto errorMessage = "Emparelhamento encontrado nao e perfeito.";
+        printErrorMessage(k, errorMessage);
+        exit(-1);
+    }
+
     // inicie F como um grafo com todos os vértices de g mas sem arestas
+    Grafo F(grafo.getNumeroVertices());
     // adicione a F todas as arestas de g que correspondem as arestas outer de M em F
     // retorne F
 }
