@@ -24,6 +24,7 @@ void achaKFatorSimples(Grafo &grafo, const int k)
     Grafo g_linha = grafo.criaGrafoInflado(k);
     cout << g_linha.toString() << endl;
 
+    exit(-1);
     GrafoAdapter Adapter(grafo);
     Matching M(Adapter);
     list<int> matching;

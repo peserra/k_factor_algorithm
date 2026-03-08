@@ -57,6 +57,7 @@ private:
     int numeroArestas;
     int menorGrau;
     vector<int> grausVertices;
+    vector<int> indicesOuterDisponivies; // para acessar rapidamente vertices outer disponiveis
     vector<int> indicesIniciais;
     vector<vector<int>> listaAdjacencias;
     vector<vector<bool>> matrizAdjacencias;
@@ -71,7 +72,7 @@ private:
         popula a lista de adjacencias de um grafo inflado seguindo as regras
        estruturais de sua criação segundo o algoritmo.
     */
-    void preencheArestasGrafoInflado(Grafo &grafoInflado, const int k) const;
+    void preencheArestasGrafoInflado(Grafo &grafoInflado, const int k);
 
     void adicionaArestasCore(Grafo &grafoInflado, const int indiceInicialAtual,
                              const int ultimoIndiceCore,
@@ -81,7 +82,7 @@ private:
                               const int verticeAtual) const;
 
     void adicionaArestasOuter(Grafo &grafoInflado, const int ultimoIndiceInner,
-                              const int indiceAtual, const int verticeAtual) const;
+                              const int indiceAtual, const int verticeAtual);
 
     // Depth-first search iterativa
     void Dfs(const int verticeInicial, vector<bool> &visitados);

@@ -107,6 +107,8 @@ void Grafo::criaListaGraus()
         grausVertices[i] = grau;
         menorGrau = grau < menorGrau ? grau : menorGrau;
     }
+
+    indicesOuterDisponivies = grausVertices;
 }
 
 Grafo Grafo::criaGrafoInflado(const int k)
@@ -119,7 +121,7 @@ Grafo Grafo::criaGrafoInflado(const int k)
     return grafoInflado;
 }
 
-void Grafo::preencheArestasGrafoInflado(Grafo &grafoInflado, const int k) const
+void Grafo::preencheArestasGrafoInflado(Grafo &grafoInflado, const int k)
 {
     // itera sobre os vértices do grafo original
     for (auto indiceVerticeAtual = 0; indiceVerticeAtual < numeroVertices; ++indiceVerticeAtual)
@@ -175,27 +177,42 @@ void Grafo::adicionaArestasOuter(
     Grafo &grafoInflado,
     const int ultimoIndiceInner,
     const int indiceAtualGadget,
-    const int indiceVerticeAtual) const
+    const int indiceVerticeAtual)
 {
     // calcula em qual vértice outer estou (primeiro, segundo, ...)
     int indiceRelativoOuter = indiceAtualGadget - ultimoIndiceInner - 1;
     // pega a adjacência no indice relativo do vértice atual
     int verticeAdjacenteRelativo = listaAdjacencias[indiceVerticeAtual][indiceRelativoOuter];
-    // pega valor do primeiro indice outer do vértice de destino
-    int indiceOuterDestino = indicesIniciais[verticeAdjacenteRelativo] + grausVertices[verticeAdjacenteRelativo] + 2;
-    // pega o valor do ultimo indice outer no vértice de destino
-    int ultimoIndiceOuterDestino = indicesIniciais[verticeAdjacenteRelativo] + grausVertices[verticeAdjacenteRelativo] * 2 + 1;
-    // procura pelo vértice outer do destino que não tem nenhuma adjacencia
-    while (indiceOuterDestino <= ultimoIndiceOuterDestino)
+
+    // só cria aresta se indiceVerticeAtual < verticeAdjacenteRelativo para evitar duplicatas
+    if (indiceVerticeAtual < verticeAdjacenteRelativo)
     {
-        if (grafoInflado.listaAdjacencias[indiceOuterDestino].size() == 0)
-        {
-            // cria aresta entre vértice do gadget atual e vértice outer do destino encontrado
-            grafoInflado.adicionaAresta(indiceAtualGadget, indiceOuterDestino);
-            break;
-        }
-        indiceOuterDestino++;
+        // pega valor do primeiro indice outer do vértice de destino
+        int indiceOuterDestino = indicesIniciais[verticeAdjacenteRelativo] + grausVertices[verticeAdjacenteRelativo] + 2;
+        // pega o valor do ultimo indice outer no vértice de destino
+        int ultimoIndiceOuterDestino = indicesIniciais[verticeAdjacenteRelativo] + grausVertices[verticeAdjacenteRelativo] * 2 + 1;
+
+        // adiciona a conexão entre o vertice outer atual e o vertice outer diponivel no destino
+        indiceOuterDestino = ultimoIndiceOuterDestino - indicesOuterDisponivies[verticeAdjacenteRelativo] + 1;
+
+        // adiciona a aresta
+        grafoInflado.adicionaAresta(indiceAtualGadget, indiceOuterDestino);
+        // ajusta quantidade de vértices outer disponiveis para o vertice utilizado
+        indicesOuterDisponivies[verticeAdjacenteRelativo] -= 1;
     }
+
+    // // procura pelo vértice outer do destino que não tem nenhuma adjacencia
+    // while (indiceOuterDestino <= ultimoIndiceOuterDestino)
+    // {
+    //     if (grafoInflado.listaAdjacencias[indiceOuterDestino].size() == 0)
+    //     {
+    //         // cria aresta entre vértice do gadget atual e vértice outer do destino encontrado
+
+    //         grafoInflado.adicionaAresta(indiceAtualGadget, indiceOuterDestino);
+    //         break;
+    //     }
+    //     indiceOuterDestino++;
+    // }
 }
 
 void Grafo::populaTabelaIndicesIniciais(
