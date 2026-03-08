@@ -20,6 +20,7 @@ public:
     // para algoritmo de matching funcionar
     //  retorna as extremidades de uma aresta, dado o indice
     pair<int, int> getAresta(int indiceAresta) const;
+
     // retorna o indice de uma aresta, dadas as extremidades
     int getIndiceAresta(int u, int v) const;
 
@@ -48,6 +49,10 @@ public:
     // 'infla' o grafo, seguindo o algoritmo.
     Grafo criaGrafoInflado(const int k);
 
+    bool verticePertenceOuter(int vertice);
+
+    int getVerticeOriginal(int verticeGadget) const;
+
     // facilita a visualização do grafo no print
     string toString() const;
 
@@ -59,6 +64,7 @@ private:
     vector<int> grausVertices;
     vector<int> indicesOuterDisponivies; // para acessar rapidamente vertices outer disponiveis
     vector<int> indicesIniciais;
+    vector<int> verticesOuter;
     vector<vector<int>> listaAdjacencias;
     vector<vector<bool>> matrizAdjacencias;
     vector<vector<int>> indiceArestas;
@@ -84,10 +90,8 @@ private:
     void adicionaArestasOuter(Grafo &grafoInflado, const int ultimoIndiceInner,
                               const int indiceAtual, const int verticeAtual);
 
-    // Depth-first search iterativa
-    void Dfs(const int verticeInicial, vector<bool> &visitados);
-    // Bradth-first search iterativa
-    void Bfs(const int verticeInicial, vector<bool> &visitados);
+    // relaciona um vetor do gadget ao seu vetor original
+    int buscaBinariaAlterada(vector<int> vetorOrdenado, int valor) const;
 };
 
 #endif // GRAFO_HPP

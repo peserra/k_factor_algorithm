@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
+#include <print>
 
 void printErrorMessage(const int k, const string &errorMessage)
 {
@@ -11,8 +12,9 @@ void printErrorMessage(const int k, const string &errorMessage)
          << errorMessage << endl;
 }
 
-void achaKFatorSimples(Grafo &grafo, const int k)
+Grafo achaKFatorSimples(Grafo &grafo, const int k)
 {
+    cout << "menor grau: " << grafo.getMenorGrau() << endl;
     // se g tiver vertice com grau menor que k, falha
     if (grafo.getMenorGrau() < k)
     {
@@ -21,25 +23,21 @@ void achaKFatorSimples(Grafo &grafo, const int k)
         exit(-1);
     }
     // cria grafo inflado g'
+    cout << "Criando grafo inflado ... " << endl;
     Grafo g_linha = grafo.criaGrafoInflado(k);
-    cout << g_linha.toString() << endl;
+    cout << "grafo inflado criado!" << endl;
+    // adapter para rodar o algoritmo de emparelhamento maximo
+    GrafoAdapter Adapter(g_linha);
 
-    exit(-1);
-    GrafoAdapter Adapter(grafo);
     Matching M(Adapter);
-    list<int> matching;
-    matching = M.SolveMaximumMatching();
-
-    // cout << "Number of edges in the maximum matching: " << matching.size() << endl;
-    // cout << "Edges in the matching:" << endl;
-    // for (list<int>::iterator it = matching.begin(); it != matching.end(); it++)
-    // {
-    //     pair<int, int> e = Adapter.GetEdge(*it);
-
-    //     cout << e.first << " " << e.second << endl;
-    // }
 
     // computa um emparelhamento máximo M* de g'
+
+    cout << "Buscando emparelhamento maximo no grafo inflado ..." << endl;
+    list<int> arestasEmparelhamento = M.SolveMaximumMatching();
+
+    cout << "emparelhamento encontrado!" << endl;
+
     // se M* não for perfeito, retorna erro
     if (!M.perfect)
     {
@@ -48,15 +46,33 @@ void achaKFatorSimples(Grafo &grafo, const int k)
         exit(-1);
     }
 
+    cout << "emparelhamento é perfeito!" << endl;
+
+    cout << "Criando fator ..." << endl;
     // inicie F como um grafo com todos os vértices de g mas sem arestas
-    Grafo F(grafo.getNumeroVertices());
-    // adicione a F todas as arestas de g que correspondem as arestas outer de M em F
+    Grafo F(grafo);
+    cout << "Adicionando arestas ao fator ..." << endl;
+    // adicione a F todas as arestas de G que correspondem as arestas outer de M em F
+    for (list<int>::iterator it = arestasEmparelhamento.begin(); it != arestasEmparelhamento.end(); it++)
+    {
+        pair<int, int> e = Adapter.GetEdge(*it);
+        cout << "verificando aresta" << e.first << " " << e.second << " do emparelhamento" << endl;
+        if (g_linha.verticePertenceOuter(e.first))
+        {
+            cout << "adicionando arestas ao fator ..." << endl;
+            int verticeOrigem = grafo.getVerticeOriginal(e.first);
+            int verticeDestino = grafo.getVerticeOriginal(e.second);
+
+            cout << "adicionando aresta " << verticeOrigem << " " << verticeDestino << endl;
+            F.adicionaAresta(verticeOrigem, verticeDestino);
+        }
+    }
     // retorne F
+    return F;
 }
 
 int main()
 {
-    int k = 2; // fator que se deseja encontrar no grafo
 
     std::cout << "Cole abaixo o grafo no formato correto (primeira linha: "
                  "#vertices, demais: u v arestas.):"
@@ -89,7 +105,11 @@ int main()
     }
 
     grafo.criaListaGraus();
-    std::cout << grafo.toString() << std::endl;
-    achaKFatorSimples(grafo, k);
+    std::cout << "grafo orgiginal G:\n"
+              << grafo.toString() << std::endl;
+    int k = 2; // fator que se deseja encontrar no grafo
+    Grafo fator = achaKFatorSimples(grafo, k);
+    cout << k << "-fator encontrado:\n"
+         << fator.toString() << endl;
     return 0;
 }

@@ -45,6 +45,46 @@ const vector<vector<bool>> &Grafo::getMatrizAdj() const
     return matrizAdjacencias;
 }
 
+int Grafo::buscaBinariaAlterada(vector<int> vetorOrdenado, int valor) const
+{
+
+    int esq = 0;
+    int dir = vetorOrdenado.size() - 1;
+    int indice_retorno = -1;
+
+    while (esq <= dir)
+    {
+
+        int meio = floor((double)(esq + dir) / 2);
+
+        if (vetorOrdenado[meio] <= valor)
+        {
+            indice_retorno = meio;
+            esq = meio + 1;
+        }
+        else
+        {
+            dir = meio - 1;
+        }
+    }
+    return indice_retorno;
+}
+
+bool Grafo::verticePertenceOuter(int vertice)
+{
+    // encontra vértice do grafo original originou este vertice no gadget
+    int verticeOriginal = buscaBinariaAlterada(indicesIniciais, vertice);
+
+    if (verticeOriginal == -1)
+        return false;
+
+    // verifica se está na região outer do vértice original
+    int indiceOuterInicio = indicesIniciais[verticeOriginal] + grausVertices[verticeOriginal] + 2;
+    int indiceOuterFim = indicesIniciais[verticeOriginal] + grausVertices[verticeOriginal] * 2 + 1;
+
+    return vertice >= indiceOuterInicio && vertice <= indiceOuterFim;
+}
+
 int Grafo::getIndiceAresta(int u, int v) const
 {
     if (u < 0 || v < 0 || u >= numeroVertices || v >= numeroVertices)
@@ -76,6 +116,11 @@ const vector<int> &Grafo::getGrauVertices() const
 const vector<int> &Grafo::getIndicesIniciais() const
 {
     return indicesIniciais;
+}
+
+int Grafo::getVerticeOriginal(int verticeGadget) const
+{
+    return buscaBinariaAlterada(indicesIniciais, verticeGadget);
 }
 
 /*
@@ -187,32 +232,17 @@ void Grafo::adicionaArestasOuter(
     // só cria aresta se indiceVerticeAtual < verticeAdjacenteRelativo para evitar duplicatas
     if (indiceVerticeAtual < verticeAdjacenteRelativo)
     {
-        // pega valor do primeiro indice outer do vértice de destino
-        int indiceOuterDestino = indicesIniciais[verticeAdjacenteRelativo] + grausVertices[verticeAdjacenteRelativo] + 2;
         // pega o valor do ultimo indice outer no vértice de destino
         int ultimoIndiceOuterDestino = indicesIniciais[verticeAdjacenteRelativo] + grausVertices[verticeAdjacenteRelativo] * 2 + 1;
 
         // adiciona a conexão entre o vertice outer atual e o vertice outer diponivel no destino
-        indiceOuterDestino = ultimoIndiceOuterDestino - indicesOuterDisponivies[verticeAdjacenteRelativo] + 1;
+        int indiceOuterDestino = ultimoIndiceOuterDestino - indicesOuterDisponivies[verticeAdjacenteRelativo] + 1;
 
         // adiciona a aresta
         grafoInflado.adicionaAresta(indiceAtualGadget, indiceOuterDestino);
         // ajusta quantidade de vértices outer disponiveis para o vertice utilizado
         indicesOuterDisponivies[verticeAdjacenteRelativo] -= 1;
     }
-
-    // // procura pelo vértice outer do destino que não tem nenhuma adjacencia
-    // while (indiceOuterDestino <= ultimoIndiceOuterDestino)
-    // {
-    //     if (grafoInflado.listaAdjacencias[indiceOuterDestino].size() == 0)
-    //     {
-    //         // cria aresta entre vértice do gadget atual e vértice outer do destino encontrado
-
-    //         grafoInflado.adicionaAresta(indiceAtualGadget, indiceOuterDestino);
-    //         break;
-    //     }
-    //     indiceOuterDestino++;
-    // }
 }
 
 void Grafo::populaTabelaIndicesIniciais(
