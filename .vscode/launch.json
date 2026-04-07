@@ -5,15 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug acha_k_fator (GDB)",
+            "name": "Debug acha_k_fator (LLDB)",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/output/acha_k_fator",
             "args": [],
             "cwd": "${workspaceFolder}",
-            "miDebuggerPath": "/usr/sbin/gdb",
-            "MIMode": "gdb",
-            "preLaunchTask": "build"
+            "MIMode": "lldb",
+            "preLaunchTask": "build",
+            "stopAtEntry": false,
+            "externalConsole": true
         }
     ]
 }
