@@ -45,25 +45,18 @@ Grafo achaKFatorSimples(Grafo &grafo, const int k)
         printErrorMessage(k, errorMessage);
         exit(-1);
     }
-
     cout << "emparelhamento é perfeito!" << endl;
 
-    cout << "Criando fator ..." << endl;
     // inicie F como um grafo com todos os vértices de g mas sem arestas
-    Grafo F(grafo);
-    cout << "Adicionando arestas ao fator ..." << endl;
+    Grafo F(grafo.getNumeroVertices());
     // adicione a F todas as arestas de G que correspondem as arestas outer de M em F
     for (list<int>::iterator it = arestasEmparelhamento.begin(); it != arestasEmparelhamento.end(); it++)
     {
         pair<int, int> e = Adapter.GetEdge(*it);
-        cout << "verificando aresta" << e.first << " " << e.second << " do emparelhamento" << endl;
         if (g_linha.verticePertenceOuter(e.first))
         {
-            cout << "adicionando arestas ao fator ..." << endl;
             int verticeOrigem = grafo.getVerticeOriginal(e.first);
             int verticeDestino = grafo.getVerticeOriginal(e.second);
-
-            cout << "adicionando aresta " << verticeOrigem << " " << verticeDestino << endl;
             F.adicionaAresta(verticeOrigem, verticeDestino);
         }
     }

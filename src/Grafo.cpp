@@ -159,8 +159,10 @@ void Grafo::criaListaGraus()
 Grafo Grafo::criaGrafoInflado(const int k)
 {
     int numeroVerticesGrafoInflado = k * numeroVertices + 4 * numeroArestas;
-    populaTabelaIndicesIniciais(k);
+    populaTabelaIndicesIniciais(k); // Popula no grafo original
     Grafo grafoInflado(numeroVerticesGrafoInflado);
+    // Copia os indices iniciais do original para o inflado
+    grafoInflado.indicesIniciais = this->indicesIniciais;
     preencheArestasGrafoInflado(grafoInflado, k);
     grafoInflado.criaListaGraus();
     return grafoInflado;
