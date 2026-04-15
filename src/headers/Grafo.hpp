@@ -11,11 +11,12 @@ class Grafo
 {
 public:
     // Construtor
-    Grafo(int numeroVertices);
+    Grafo(int numeroVertices, int k = 0);
     // getters
     int getNumeroVertices() const;
     int getNumeroArestas() const;
     int getMenorGrau() const;
+    int getK() const;
 
     // para algoritmo de matching funcionar
     //  retorna as extremidades de uma aresta, dado o indice
@@ -61,6 +62,7 @@ private:
     int numeroVertices;
     int numeroArestas;
     int menorGrau;
+    int k;
     vector<int> grausVertices;
     vector<int> indicesOuterDisponivies; // para acessar rapidamente vertices outer disponiveis
     vector<int> indicesIniciais;
@@ -72,13 +74,13 @@ private:
 
     // metodos
 
-    void populaTabelaIndicesIniciais(const int k);
+    void populaTabelaIndicesIniciais();
 
     /*
         popula a lista de adjacencias de um grafo inflado seguindo as regras
        estruturais de sua criação segundo o algoritmo.
     */
-    void preencheArestasGrafoInflado(Grafo &grafoInflado, const int k);
+    void preencheArestasGrafoInflado(Grafo &grafoInflado);
 
     void adicionaArestasCore(Grafo &grafoInflado, const int indiceInicialAtual,
                              const int ultimoIndiceCore,

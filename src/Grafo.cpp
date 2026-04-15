@@ -2,10 +2,11 @@
 
 constexpr int MENOR_GRAU_INICIAL = 9999;
 // metodo construtor
-Grafo::Grafo(int numeroVertices)
+Grafo::Grafo(int numeroVertices, int k)
     : numeroVertices(numeroVertices),
       numeroArestas(0),
       menorGrau(MENOR_GRAU_INICIAL),
+      k(k),
       grausVertices(numeroVertices, 0),
       indicesIniciais(numeroVertices, 0),
       listaAdjacencias(numeroVertices),
@@ -33,6 +34,11 @@ int Grafo::getNumeroArestas() const
 int Grafo::getMenorGrau() const
 {
     return menorGrau;
+}
+
+int Grafo::getK() const
+{
+    return k;
 }
 
 const vector<vector<int>> &Grafo::getListaAdj() const
@@ -79,8 +85,8 @@ bool Grafo::verticePertenceOuter(int vertice)
         return false;
 
     // verifica se está na região outer do vértice original
-    int indiceOuterInicio = indicesIniciais[verticeOriginal] + grausVertices[verticeOriginal] + 2;
-    int indiceOuterFim = indicesIniciais[verticeOriginal] + grausVertices[verticeOriginal] * 2 + 1;
+    int indiceOuterInicio = indicesIniciais[verticeOriginal] + k + grausVertices[verticeOriginal];
+    int indiceOuterFim = indicesIniciais[verticeOriginal] + k + grausVertices[verticeOriginal] * 2 - 1;
 
     return vertice >= indiceOuterInicio && vertice <= indiceOuterFim;
 }
@@ -158,25 +164,26 @@ void Grafo::criaListaGraus()
 
 Grafo Grafo::criaGrafoInflado(const int k)
 {
+    this->k = k;
     int numeroVerticesGrafoInflado = k * numeroVertices + 4 * numeroArestas;
-    populaTabelaIndicesIniciais(k); // Popula no grafo original
-    Grafo grafoInflado(numeroVerticesGrafoInflado);
+    populaTabelaIndicesIniciais(); // Popula no grafo original
+    Grafo grafoInflado(numeroVerticesGrafoInflado, k);
     // Copia os indices iniciais do original para o inflado
     grafoInflado.indicesIniciais = this->indicesIniciais;
-    preencheArestasGrafoInflado(grafoInflado, k);
+    preencheArestasGrafoInflado(grafoInflado);
     grafoInflado.criaListaGraus();
     return grafoInflado;
 }
 
-void Grafo::preencheArestasGrafoInflado(Grafo &grafoInflado, const int k)
+void Grafo::preencheArestasGrafoInflado(Grafo &grafoInflado)
 {
     // itera sobre os vértices do grafo original
     for (auto indiceVerticeAtual = 0; indiceVerticeAtual < numeroVertices; ++indiceVerticeAtual)
     {
         // calculo de indices para os vértices core, inner e outer do gadget
         int ultimoIndiceCore = indicesIniciais[indiceVerticeAtual] + k - 1;
-        int ultimoIndiceInner = indicesIniciais[indiceVerticeAtual] + grausVertices[indiceVerticeAtual] + 1;
-        int ultimoVerticeGadget = indicesIniciais[indiceVerticeAtual] + grausVertices[indiceVerticeAtual] * 2 + 1;
+        int ultimoIndiceInner = indicesIniciais[indiceVerticeAtual] + k + grausVertices[indiceVerticeAtual] - 1;
+        int ultimoVerticeGadget = indicesIniciais[indiceVerticeAtual] + k + grausVertices[indiceVerticeAtual] * 2 - 1;
         int indiceAtualGadget = indicesIniciais[indiceVerticeAtual];
 
         while (indiceAtualGadget <= ultimoVerticeGadget)
@@ -235,7 +242,7 @@ void Grafo::adicionaArestasOuter(
     if (indiceVerticeAtual < verticeAdjacenteRelativo)
     {
         // pega o valor do ultimo indice outer no vértice de destino
-        int ultimoIndiceOuterDestino = indicesIniciais[verticeAdjacenteRelativo] + grausVertices[verticeAdjacenteRelativo] * 2 + 1;
+        int ultimoIndiceOuterDestino = indicesIniciais[verticeAdjacenteRelativo] + k + grausVertices[verticeAdjacenteRelativo] * 2 - 1;
 
         // adiciona a conexão entre o vertice outer atual e o vertice outer diponivel no destino
         int indiceOuterDestino = ultimoIndiceOuterDestino - indicesOuterDisponivies[verticeAdjacenteRelativo] + 1;
@@ -247,8 +254,7 @@ void Grafo::adicionaArestasOuter(
     }
 }
 
-void Grafo::populaTabelaIndicesIniciais(
-    const int k)
+void Grafo::populaTabelaIndicesIniciais()
 {
     int somaVizinhanca = 0;
     int indiceConversao = 0;

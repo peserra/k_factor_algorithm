@@ -100,7 +100,11 @@ int main()
     grafo.criaListaGraus();
     std::cout << "grafo orgiginal G:\n"
               << grafo.toString() << std::endl;
-    int k = 2; // fator que se deseja encontrar no grafo
+
+    int k;
+    std::cout << "Digite o valor de k (para encontrar um k-fator): ";
+    std::cin >> k;
+
     Grafo fator = achaKFatorSimples(grafo, k);
     cout << k << "-fator encontrado:\n"
          << fator.toString() << endl;

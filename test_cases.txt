@@ -1,0 +1,98 @@
+# TEST CASE 1: Ciclo C4 (todos os vértices com grau 2) - válido para k=2
+# Vértices: 0, 1, 2, 3 formando um ciclo 0-1-2-3-0
+4
+0 1
+1 2
+2 3
+3 0
+
+# TEST CASE 2: Ciclo C6 (todos os vértices com grau 2) - válido para k=2
+# Vértices: 0, 1, 2, 3, 4, 5 formando um ciclo
+6
+0 1
+1 2
+2 3
+3 4
+4 5
+5 0
+
+# TEST CASE 3: Grafo Completo K4 (todos com grau 3) - válido para k=2 e k=3
+# Vértices: 0, 1, 2, 3 (cada um conectado a todos os outros)
+4
+0 1
+0 2
+0 3
+1 2
+1 3
+2 3
+
+# TEST CASE 4: Grafo Completo K5 (todos com grau 4) - válido para k=2, k=3, k=4
+# Vértices: 0, 1, 2, 3, 4 (cada um conectado a todos os outros)
+5
+0 1
+0 2
+0 3
+0 4
+1 2
+1 3
+1 4
+2 3
+2 4
+3 4
+
+# TEST CASE 5: Grafo Bipartido K(3,3) (todos com grau 3)
+# Dois conjuntos: {0,1,2} e {3,4,5}
+6
+0 3
+0 4
+0 5
+1 3
+1 4
+1 5
+2 3
+2 4
+2 5
+
+# TEST CASE 6: Ciclo C8 com corda (todos com grau >= 2)
+# Base: ciclo 0-1-2-3-4-5-6-7-0, plus chord 0-4
+8
+0 1
+1 2
+2 3
+3 4
+4 5
+5 6
+6 7
+7 0
+0 4
+
+# TEST CASE 7: Prisma triangular (todos com grau 3) - válido para k=2 e k=3
+# 2 triângulos conectados
+6
+0 1
+1 2
+2 0
+3 4
+4 5
+5 3
+0 3
+1 4
+2 5
+
+# TEST CASE 8: Grafo de Petersen (todos com grau 3) - válido para k=2 e k=3
+10
+0 1
+1 2
+2 3
+3 4
+4 0
+5 7
+7 9
+9 6
+6 8
+8 5
+0 5
+1 6
+2 7
+3 8
+4 9
