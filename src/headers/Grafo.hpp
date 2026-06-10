@@ -57,6 +57,9 @@ public:
     // facilita a visualização do grafo no print
     string toString() const;
 
+    // exibe apenas as arestas do fator (sem mostrar todos os vértices)
+    string toStringFator() const;
+
 private:
     // propriedades
     int numeroVertices;

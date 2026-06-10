@@ -107,6 +107,6 @@ int main()
 
     Grafo fator = achaKFatorSimples(grafo, k);
     cout << k << "-fator encontrado:\n"
-         << fator.toString() << endl;
+         << fator.toStringFator() << endl;
     return 0;
 }

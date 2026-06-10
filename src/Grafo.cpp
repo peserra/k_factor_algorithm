@@ -1,4 +1,5 @@
 #include "headers/Grafo.hpp"
+#include <climits>
 
 constexpr int MENOR_GRAU_INICIAL = 9999;
 // metodo construtor
@@ -292,6 +293,50 @@ string Grafo::toString() const
                 oss << ", ";
         }
         oss << "]\n";
+    }
+
+    return oss.str();
+}
+
+string Grafo::toStringFator() const
+{
+    ostringstream oss;
+
+    // Calcula o menor grau e graus dos vértices para exibição
+    int menorGrauFator = INT_MAX;
+    vector<int> grausFator(numeroVertices, 0);
+
+    for (int i = 0; i < numeroVertices; i++)
+    {
+        int grau = listaAdjacencias[i].size();
+        grausFator[i] = grau;
+        if (grau > 0 && grau < menorGrauFator)
+        {
+            menorGrauFator = grau;
+        }
+    }
+
+    // Se nenhuma aresta, o menor grau é 0
+    if (menorGrauFator == INT_MAX)
+    {
+        menorGrauFator = 0;
+    }
+
+    // Exibe informações gerais do fator
+    oss << "Fator: " << numeroVertices << " vértices, " << numeroArestas
+        << " arestas, menor grau: " << menorGrauFator << "\n";
+
+    // Exibe apenas as arestas
+    oss << "Arestas do fator:\n";
+    for (int i = 0; i < numeroVertices; i++)
+    {
+        for (int j : listaAdjacencias[i])
+        {
+            if (i < j) // Exibe cada aresta uma única vez
+            {
+                oss << i << " - " << j << "\n";
+            }
+        }
     }
 
     return oss.str();
