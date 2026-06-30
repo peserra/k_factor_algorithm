@@ -1,64 +1,558 @@
-<!-- # Algorithms for Maximum Cardinality Matching and Minimum Cost Perfect Matching Problems in General Graphs -->
-<!---->
-<!-- I implemented these algorithms during my PhD, in 2011, following the description in: -->
-<!---->
-<!-- *Gerards, A.M.H. (1995). Matching. In Ball, M., Magnanti, T., Monma, C., and Nemhauser, G., editors, Network Models, volume 7 of Handbooks in Operations Research and Management Science, chapter 3, pages 135-224. Elsevier.* -->
-<!---->
-<!-- See Example.cpp for examples of how to use the API. -->
-<!---->
-<!-- Compilation with G++: -->
-<!-- ``` -->
-<!-- g++ -O3 Example.cpp BinaryHeap.cpp Matching.cpp Graph.cpp -o example -->
-<!-- ``` -->
-<!---->
-<!-- ## To use as a matching solver: -->
-<!-- ``` -->
-<!-- ./example -f <filename> <--minweight | --max> -->
-<!-- ``` -->
-<!-- `--minweight` for minimum weight perfect matching -->
-<!---->
-<!-- `--max` for maximum cardinality matching -->
-<!---->
-<!---->
-<!-- **File format:** -->
-<!---->
-<!-- the first two lines give n (number of vertices) and m (number of edges), respectively, followed by m lines, each with a tuple (u, v [, c]) representing the edges. In each tuple, u and v are the endpoints (0-based indexing) of the edge and c is its cost. The cost is optional if --max is specified. -->
-<!---->
-<!-- Example, `input.txt`: -->
-<!-- ``` -->
-<!-- 10 -->
-<!-- 16 -->
-<!-- 0 1 10 -->
-<!-- 0 2 4 -->
-<!-- 1 2 3 -->
-<!-- 1 5 2 -->
-<!-- 1 6 2 -->
-<!-- 2 3 1 -->
-<!-- 2 4 2 -->
-<!-- 3 4 5 -->
-<!-- 4 6 4 -->
-<!-- 4 7 1 -->
-<!-- 4 8 3 -->
-<!-- 5 6 1 -->
-<!-- 6 7 2 -->
-<!-- 7 8 3 -->
-<!-- 7 9 2 -->
-<!-- 8 9 1 -->
-<!-- ``` -->
-<!---->
-<!-- ``` -->
-<!-- ./example -f input.txt --minweight -->
-<!-- ``` -->
-<!---->
-<!-- Output: -->
-<!-- ``` -->
-<!-- Optimal matching cost: 14 -->
-<!-- Edges in the matching: -->
-<!-- 0 1 -->
-<!-- 2 3 -->
-<!-- 4 7 -->
-<!-- 5 6 -->
-<!-- 8 9 -->
-<!-- ``` -->
-<!---->
-<!-- Feel free to contact me if you have any problem. -->
+# Algoritmo de K-Fator / K-Factor Algorithm
+
+## Navegação / Navigation
+
+- [Visão Geral / Overview](#visão-geral--overview)
+- [Referência / Reference](#referência--reference)
+- [Estrutura do Repositório / Repository Structure](#estrutura-do-repositório--repository-structure)
+- [Requisitos / Requirements](#requisitos--requirements)
+- [Como Compilar e Executar / Build and Run](#como-compilar-e-executar--build-and-run)
+- [Formato da Entrada / Input Format](#formato-da-entrada--input-format)
+- [Saída / Output](#saída--output)
+- [Como Rodar os Testes / Running Tests](#como-rodar-os-testes--running-tests)
+- [Formato dos Arquivos de Teste / Test File Format](#formato-dos-arquivos-de-teste--test-file-format)
+- [Como Gerar Testes / Generating Tests](#como-gerar-testes--generating-tests)
+- [Notas Sobre o Algoritmo / Algorithm Notes](#notas-sobre-o-algoritmo--algorithm-notes)
+- [Problemas Comuns / Common Problems](#problemas-comuns--common-problems)
+
+## Visão Geral / Overview
+
+**Português**
+
+Este projeto implementa um algoritmo para encontrar um `k`-fator em um grafo
+simples, não direcionado.
+
+Um `k`-fator é um subgrafo gerador em que todo vértice do grafo original tem
+grau exatamente `k`. Por exemplo, um `2`-fator é uma coleção de ciclos que cobre
+todos os vértices. O programa constrói um grafo auxiliar inflado e usa um
+algoritmo de emparelhamento máximo para decidir se existe um fator válido e
+recuperar as arestas escolhidas no grafo original.
+
+A implementação está em C++23 e gera o executável `acha_k_fator`.
+
+**English**
+
+This project implements an algorithm for finding a `k`-factor in a simple
+undirected graph.
+
+A `k`-factor is a spanning subgraph where every original vertex has degree
+exactly `k`. For example, a `2`-factor is a collection of cycles that covers all
+vertices. The program builds an inflated auxiliary graph and uses a maximum
+matching algorithm to decide whether a valid factor exists and to recover the
+selected original edges.
+
+The implementation is written in C++23 and builds an executable named
+`acha_k_fator`.
+
+## Referência / Reference
+
+**Português**
+
+Este trabalho usa como referência principal o artigo original disponível em:
+
+https://www.sciencedirect.com/science/article/abs/pii/S0020019009000647
+
+**English**
+
+This work uses the original paper available at the following link as its main
+reference:
+
+https://www.sciencedirect.com/science/article/abs/pii/S0020019009000647
+
+## Estrutura do Repositório / Repository Structure
+
+**Português**
+
+```text
+.
+|-- src/                  # Código-fonte em C++
+|-- src/headers/          # Headers em C++
+|-- tests/                # Arquivos de teste gerados
+|-- test-results/         # Relatórios Markdown gerados pelos testes
+|-- CMakeLists.txt        # Configuração de build com CMake
+|-- run.sh                # Script auxiliar para compilar e executar
+|-- run_tests.sh          # Script de testes automatizados
+|-- tests-generator.py    # Gerador de casos de teste
+`-- test_input.txt        # Pequeno exemplo de entrada
+```
+
+**English**
+
+```text
+.
+|-- src/                  # C++ source code
+|-- src/headers/          # C++ headers
+|-- tests/                # Generated test input files
+|-- test-results/         # Markdown reports generated by the test script
+|-- CMakeLists.txt        # CMake build configuration
+|-- run.sh                # Build and run helper
+|-- run_tests.sh          # Automated test runner
+|-- tests-generator.py    # Test case generator
+`-- test_input.txt        # Small example input
+```
+
+## Requisitos / Requirements
+
+**Português**
+
+- CMake 3.20 ou superior
+- Compilador C++ com suporte a C++23
+- Bash, para executar `run.sh` e `run_tests.sh`
+- Python 3, apenas se quiser gerar novos testes com `tests-generator.py`
+
+**English**
+
+- CMake 3.20 or newer
+- A C++ compiler with C++23 support
+- Bash, for `run.sh` and `run_tests.sh`
+- Python 3, only if you want to generate new tests with `tests-generator.py`
+
+## Como Compilar e Executar / Build and Run
+
+**Português**
+
+A forma mais simples de compilar e executar o programa é:
+
+```bash
+./run.sh
+```
+
+Esse script:
+
+1. Configura o CMake em `build/`, se necessário.
+2. Compila o alvo `acha_k_fator`.
+3. Executa `output/acha_k_fator`.
+
+Também é possível compilar manualmente:
+
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --target acha_k_fator
+./output/acha_k_fator
+```
+
+**English**
+
+The easiest way to build and run the program is:
+
+```bash
+./run.sh
+```
+
+This script:
+
+1. Configures CMake in `build/`, if needed.
+2. Builds the `acha_k_fator` target.
+3. Runs `output/acha_k_fator`.
+
+You can also build manually:
+
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --target acha_k_fator
+./output/acha_k_fator
+```
+
+## Formato da Entrada / Input Format
+
+**Português**
+
+O executável é interativo. Primeiro ele lê o grafo e depois pede o valor de
+`k`.
+
+Formato esperado:
+
+```text
+<numero_de_vertices>
+<u> <v>
+<u> <v>
+...
+
+<k>
+```
+
+Detalhes importantes:
+
+- Os vértices são indexados a partir de zero: os IDs válidos vão de `0` até
+  `n - 1`.
+- O grafo é não direcionado.
+- Cada linha de aresta contém dois inteiros: `u v`.
+- Não inclua uma linha com a quantidade de arestas.
+- Termine a lista de arestas com uma linha vazia.
+- Self-loops não são suportados.
+- Arestas duplicadas são ignoradas pela estrutura do grafo.
+- Pesos nas arestas não são suportados por este executável.
+
+Exemplo:
+
+```text
+6
+0 1
+1 2
+2 0
+3 4
+4 5
+5 3
+2 3
+
+2
+```
+
+Para executar esse exemplo direto no terminal:
+
+```bash
+printf "6\n0 1\n1 2\n2 0\n3 4\n4 5\n5 3\n2 3\n\n2\n" | ./output/acha_k_fator
+```
+
+Usando o arquivo `test_input.txt`, adicione a linha vazia e o valor de `k`:
+
+```bash
+{ cat test_input.txt; printf "\n2\n"; } | ./output/acha_k_fator
+```
+
+**English**
+
+The executable is interactive. It first reads the graph and then asks for the
+value of `k`.
+
+Expected format:
+
+```text
+<number_of_vertices>
+<u> <v>
+<u> <v>
+...
+
+<k>
+```
+
+Important details:
+
+- Vertices are zero-indexed: valid vertex IDs are `0` through `n - 1`.
+- The graph is undirected.
+- Each edge line contains two integers: `u v`.
+- Do not include a line with the number of edges.
+- End the edge list with an empty line.
+- Self-loops are not supported.
+- Duplicate edges are ignored by the graph structure.
+- Edge weights are not supported by this executable.
+
+Example:
+
+```text
+6
+0 1
+1 2
+2 0
+3 4
+4 5
+5 3
+2 3
+
+2
+```
+
+To run this example directly from the terminal:
+
+```bash
+printf "6\n0 1\n1 2\n2 0\n3 4\n4 5\n5 3\n2 3\n\n2\n" | ./output/acha_k_fator
+```
+
+Using the included `test_input.txt`, add the empty line and the value of `k`:
+
+```bash
+{ cat test_input.txt; printf "\n2\n"; } | ./output/acha_k_fator
+```
+
+## Saída / Output
+
+**Português**
+
+Quando um fator é encontrado, o programa imprime informações de diagnóstico
+sobre o grafo original, a construção do grafo inflado e o fator final.
+
+A parte mais importante é a seção final:
+
+```text
+<k>-fator encontrado:
+Fator: <n> vértices, <m> arestas, menor grau: <k>
+Arestas do fator:
+0 - 1
+0 - 2
+1 - 2
+3 - 4
+3 - 5
+4 - 5
+```
+
+Se o grafo não tiver um `k`-fator, o programa imprime uma mensagem começando
+com:
+
+```text
+Não existe <k>-fator no grafo.
+```
+
+Uma condição de falha rápida acontece quando algum vértice tem grau menor que
+`k`.
+
+**English**
+
+When a factor is found, the program prints diagnostic information about the
+original graph, the inflated graph construction, and the final factor.
+
+The most important part is the final section:
+
+```text
+<k>-fator encontrado:
+Fator: <n> vértices, <m> arestas, menor grau: <k>
+Arestas do fator:
+0 - 1
+0 - 2
+1 - 2
+3 - 4
+3 - 5
+4 - 5
+```
+
+If the graph does not have a `k`-factor, the program prints a message beginning
+with:
+
+```text
+Não existe <k>-fator no grafo.
+```
+
+One fast failure condition happens when some vertex has degree smaller than
+`k`.
+
+## Como Rodar os Testes / Running Tests
+
+**Português**
+
+Primeiro compile o executável:
+
+```bash
+./run.sh
+```
+
+Depois execute os testes automatizados:
+
+```bash
+./run_tests.sh
+```
+
+O script de testes:
+
+- Procura arquivos no padrão `tests/test_case_*.txt`.
+- Extrai `k` do nome do arquivo, por exemplo `test_case_001_k2_n10.txt`.
+- Envia o grafo mais o `k` extraído para `output/acha_k_fator`.
+- Valida se cada aresta retornada no fator existe no grafo original.
+- Valida se o fator tem exatamente `n * k / 2` arestas.
+- Valida se todo vértice tem grau exatamente `k`.
+
+Depois da execução, são gerados:
+
+- `TEST_RESULTS_EXECUTION.log`
+- `test-results/TEST_REPORT.md`
+
+**English**
+
+First build the executable:
+
+```bash
+./run.sh
+```
+
+Then run the automated tests:
+
+```bash
+./run_tests.sh
+```
+
+The test runner:
+
+- Looks for files matching `tests/test_case_*.txt`.
+- Extracts `k` from the filename, for example `test_case_001_k2_n10.txt`.
+- Sends the graph plus the extracted `k` to `output/acha_k_fator`.
+- Validates that every returned factor edge exists in the original graph.
+- Validates that the factor has exactly `n * k / 2` edges.
+- Validates that every vertex has degree exactly `k`.
+
+After execution, it writes:
+
+- `TEST_RESULTS_EXECUTION.log`
+- `test-results/TEST_REPORT.md`
+
+## Formato dos Arquivos de Teste / Test File Format
+
+**Português**
+
+Os arquivos de teste gerados contêm apenas o grafo:
+
+```text
+<numero_de_vertices>
+<u> <v>
+<u> <v>
+...
+```
+
+Eles não incluem a linha vazia nem o valor de `k`. O script de testes obtém
+`k` a partir do nome do arquivo.
+
+Exemplo de nome:
+
+```text
+test_case_001_k2_n10.txt
+```
+
+Isso significa:
+
+- número do caso de teste: `001`
+- fator procurado: `k = 2`
+- número de vértices: `n = 10`
+
+**English**
+
+Generated test files contain only the graph:
+
+```text
+<number_of_vertices>
+<u> <v>
+<u> <v>
+...
+```
+
+They do not include the empty line or the value of `k`. The test script gets
+`k` from the filename.
+
+Example filename:
+
+```text
+test_case_001_k2_n10.txt
+```
+
+This means:
+
+- test case number: `001`
+- requested factor: `k = 2`
+- number of vertices: `n = 10`
+
+## Como Gerar Testes / Generating Tests
+
+**Português**
+
+Use o gerador em Python:
+
+```bash
+python3 tests-generator.py
+```
+
+Por padrão, ele gera grafos esparsos para:
+
+- `k = 2` e `k = 3`
+- `n = 10`, `n = 50` e `n = 100`
+- `10` casos para cada grupo `k/n`
+
+Opções úteis:
+
+```bash
+python3 tests-generator.py --cases-per-group 5
+python3 tests-generator.py --vertices 10,20,50
+python3 tests-generator.py --seed 123
+python3 tests-generator.py --keep-existing
+```
+
+Sem `--keep-existing`, o gerador apaga os arquivos existentes em
+`tests/test_case_*.txt` antes de escrever novos casos.
+
+**English**
+
+Use the Python generator:
+
+```bash
+python3 tests-generator.py
+```
+
+By default, it generates sparse graphs for:
+
+- `k = 2` and `k = 3`
+- `n = 10`, `n = 50`, and `n = 100`
+- `10` cases for each `k/n` group
+
+Useful options:
+
+```bash
+python3 tests-generator.py --cases-per-group 5
+python3 tests-generator.py --vertices 10,20,50
+python3 tests-generator.py --seed 123
+python3 tests-generator.py --keep-existing
+```
+
+Without `--keep-existing`, the generator deletes existing
+`tests/test_case_*.txt` files before writing new cases.
+
+## Notas Sobre o Algoritmo / Algorithm Notes
+
+**Português**
+
+Em alto nível, o programa:
+
+1. Lê um grafo simples não direcionado `G`.
+2. Verifica se o grau mínimo de `G` é pelo menos `k`.
+3. Constrói um grafo auxiliar inflado.
+4. Executa emparelhamento máximo no grafo inflado.
+5. Exige que o emparelhamento encontrado seja perfeito.
+6. Converte as arestas externas selecionadas de volta para arestas do grafo
+   original.
+
+O grafo retornado é o `k`-fator.
+
+A implementação de emparelhamento máximo é baseada em código para
+emparelhamento em grafos gerais adaptado para este projeto.
+
+**English**
+
+At a high level, the program:
+
+1. Reads a simple undirected graph `G`.
+2. Checks whether the minimum degree of `G` is at least `k`.
+3. Builds an inflated auxiliary graph.
+4. Runs maximum matching on the inflated graph.
+5. Requires the matching to be perfect.
+6. Converts the selected outer edges back into edges of the original graph.
+
+The returned graph is the `k`-factor.
+
+The maximum matching implementation is based on general graph matching code
+adapted for this project.
+
+## Problemas Comuns / Common Problems
+
+**Português**
+
+- `Executable not found. Build failed.`
+  - Execute `cmake -B build -DCMAKE_BUILD_TYPE=Release` e verifique o erro do
+    CMake.
+- `Erro: vértice nao existe.`
+  - Alguma aresta referencia um vértice fora do intervalo `0..n-1`.
+- `Erro: self-loop não suportado`
+  - A entrada contém uma aresta como `3 3`.
+- Os testes falham imediatamente com `Executável não encontrado`
+  - Compile primeiro com `./run.sh` ou `cmake --build build --target acha_k_fator`.
+- Um arquivo de teste é ignorado ou rejeitado pelo script
+  - Garanta que o nome contenha `_k<number>_`, por exemplo
+    `test_case_001_k2_n10.txt`.
+
+**English**
+
+- `Executable not found. Build failed.`
+  - Run `cmake -B build -DCMAKE_BUILD_TYPE=Release` and inspect the CMake error.
+- `Erro: vértice nao existe.`
+  - An edge references a vertex outside `0..n-1`.
+- `Erro: self-loop não suportado`
+  - The input contains an edge like `3 3`.
+- Tests fail immediately with `Executável não encontrado`
+  - Build first with `./run.sh` or `cmake --build build --target acha_k_fator`.
+- A test file is skipped or rejected by the runner
+  - Make sure its filename contains `_k<number>_`, for example
+    `test_case_001_k2_n10.txt`.
+
