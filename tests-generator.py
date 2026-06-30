@@ -1,115 +1,219 @@
+import argparse
 import random
-import os
+from dataclasses import dataclass
+from pathlib import Path
 
 
-def generate_cycle_graph(n_vertices: int) -> list:
-    """Generate a cycle graph (2-regular) with n_vertices."""
-    edges = []
-    for i in range(n_vertices):
-        u = i
-        v = (i + 1) % n_vertices
-        edges.append((u, v))
-    return edges
+DEFAULT_VERTEX_COUNTS = (10, 50, 100)
+DEFAULT_K_FACTORS = (2, 3)
+DEFAULT_CASES_PER_GROUP = 10
+DEFAULT_SEED = 42
+TESTS_DIR = Path("tests")
+TEST_PATTERN = "test_case_*.txt"
 
 
-def generate_3_regular_graph(n_vertices: int) -> list:
-    """Generate a 3-regular graph (sparse, all vertices have degree 3)."""
-    if n_vertices < 4 or n_vertices % 2 != 0:
-        # For 3-regular, we need even number of vertices >= 4
-        n_vertices = ((n_vertices + 1) // 2) * 2
-        if n_vertices < 4:
-            n_vertices = 4
-
-    edges = []
-    degree = [0] * n_vertices
-
-    # Create a cycle first (gives degree 2 to all)
-    for i in range(n_vertices):
-        u = i
-        v = (i + 1) % n_vertices
-        edges.append((u, v))
-        degree[u] += 1
-        degree[v] += 1
-
-    # Add one more edge per vertex to make it 3-regular
-    # Connect vertex i to vertex (i + n//2) % n_vertices
-    for i in range(n_vertices // 2):
-        u = i
-        v = (i + n_vertices // 2) % n_vertices
-        if u != v and (u, v) not in edges and (v, u) not in edges:
-            edges.append((u, v))
-            degree[u] += 1
-            degree[v] += 1
-
-    return edges
+Edge = tuple[int, int]
 
 
-def generate_mixed_graph(n_vertices: int, density: float = 0.3) -> list:
-    """Generate a random sparse graph with controlled density."""
-    edges = set()
-    max_edges = int(n_vertices * density)
+@dataclass(frozen=True)
+class TestCase:
+    name: str
+    n_vertices: int
+    k_factor: int
+    edges: list[Edge]
 
-    while len(edges) < max_edges:
-        u = random.randint(0, n_vertices - 1)
-        v = random.randint(0, n_vertices - 1)
 
+def normalized_edge(u: int, v: int) -> Edge:
+    if u == v:
+        raise ValueError("self-loops are not valid in these test graphs")
+    return (u, v) if u < v else (v, u)
+
+
+def add_edge(edges: set[Edge], u: int, v: int) -> None:
+    edges.add(normalized_edge(u, v))
+
+
+def add_sparse_noise(
+    edges: set[Edge],
+    n_vertices: int,
+    rng: random.Random,
+    extra_edges: int,
+) -> None:
+    max_edges = n_vertices * (n_vertices - 1) // 2
+    target_size = min(len(edges) + extra_edges, max_edges)
+
+    while len(edges) < target_size:
+        u = rng.randrange(n_vertices)
+        v = rng.randrange(n_vertices)
         if u != v:
-            edge = tuple(sorted([u, v]))
-            edges.add(edge)
-
-    return list(edges)
+            add_edge(edges, u, v)
 
 
-def generate_test_case(n_vertices: int, k_factor_type: int) -> list:
-    """Generate a test case that has a k-factor."""
-    if k_factor_type == 2:
-        return generate_cycle_graph(n_vertices)
-    elif k_factor_type == 3:
-        return generate_3_regular_graph(n_vertices)
+def generate_2_factor_graph(
+    n_vertices: int,
+    rng: random.Random,
+    extra_edges: int,
+) -> list[Edge]:
+    """Generate a sparse graph guaranteed to contain a 2-factor."""
+    if n_vertices < 3:
+        raise ValueError("2-factor test graphs need at least 3 vertices")
+
+    vertices = list(range(n_vertices))
+    rng.shuffle(vertices)
+
+    edges: set[Edge] = set()
+    for i, u in enumerate(vertices):
+        add_edge(edges, u, vertices[(i + 1) % n_vertices])
+
+    add_sparse_noise(edges, n_vertices, rng, extra_edges)
+    return sorted(edges)
+
+
+def generate_3_factor_graph(
+    n_vertices: int,
+    rng: random.Random,
+    extra_edges: int,
+) -> list[Edge]:
+    """Generate a sparse graph guaranteed to contain a 3-factor."""
+    if n_vertices < 4 or n_vertices % 2 != 0:
+        raise ValueError("3-factor test graphs need an even number of vertices >= 4")
+
+    vertices = list(range(n_vertices))
+    rng.shuffle(vertices)
+
+    edges: set[Edge] = set()
+    for i, u in enumerate(vertices):
+        add_edge(edges, u, vertices[(i + 1) % n_vertices])
+
+    half = n_vertices // 2
+    for i in range(half):
+        add_edge(edges, vertices[i], vertices[i + half])
+
+    add_sparse_noise(edges, n_vertices, rng, extra_edges)
+    return sorted(edges)
+
+
+def generate_test_case(
+    n_vertices: int,
+    k_factor: int,
+    case_number: int,
+    rng: random.Random,
+) -> TestCase:
+    # Keep graphs sparse while still adding enough non-factor edges to exercise
+    # the matching construction beyond exact cycles/cubic graphs.
+    extra_edges = max(1, n_vertices // 5)
+
+    if k_factor == 2:
+        edges = generate_2_factor_graph(n_vertices, rng, extra_edges)
+    elif k_factor == 3:
+        edges = generate_3_factor_graph(n_vertices, rng, extra_edges)
     else:
-        return generate_mixed_graph(n_vertices)
+        raise ValueError(f"unsupported k-factor: {k_factor}")
+
+    name = f"test_case_{case_number:03d}_k{k_factor}_n{n_vertices}.txt"
+    return TestCase(name, n_vertices, k_factor, edges)
 
 
-def save_test_case(filename: str, n_vertices: int, edges: list):
-    """Save a test case to the tests folder."""
-    tests_dir = "./tests"
+def save_test_case(test_case: TestCase, tests_dir: Path) -> None:
+    tests_dir.mkdir(parents=True, exist_ok=True)
+    filepath = tests_dir / test_case.name
 
-    # Create tests directory if it doesn't exist
-    if not os.path.exists(tests_dir):
-        os.makedirs(tests_dir)
-
-    filepath = os.path.join(tests_dir, filename)
-    with open(filepath, 'w') as f:
-        f.write(f"{n_vertices}\n")
-        for u, v in edges:
-            f.write(f"{u} {v}\n")
+    with filepath.open("w", encoding="utf-8") as file:
+        file.write(f"{test_case.n_vertices}\n")
+        for u, v in test_case.edges:
+            file.write(f"{u} {v}\n")
 
 
-def main():
-    print("Test Case Generator for k-Factor Algorithm")
-    print("=" * 50)
+def clean_generated_tests(tests_dir: Path) -> int:
+    if not tests_dir.exists():
+        return 0
 
-    num_test_cases: int = int(input("Enter the number of test cases to generate: "))
+    removed = 0
+    for filepath in tests_dir.glob(TEST_PATTERN):
+        filepath.unlink()
+        removed += 1
+    return removed
 
-    test_configs = []
-    for i in range(num_test_cases):
-        print(f"\nTest case {i + 1}:")
-        n_vertices: int = int(input(f"  Enter number of vertices: "))
-        k_factor: int = int(input(f"  Enter k-factor to test (2 or 3): "))
 
-        if k_factor not in [2, 3]:
-            print("  Invalid k-factor. Using 2.")
-            k_factor = 2
+def parse_vertex_counts(raw_counts: str) -> tuple[int, ...]:
+    counts = tuple(int(value.strip()) for value in raw_counts.split(",") if value.strip())
+    if not counts:
+        raise ValueError("at least one vertex count is required")
+    return counts
 
-        test_configs.append((n_vertices, k_factor))
 
-    # Generate and save test cases
-    for idx, (n_vertices, k_factor) in enumerate(test_configs):
-        edges = generate_test_case(n_vertices, k_factor)
-        filename = f"test_case_{idx + 1}_k{k_factor}_n{n_vertices}.txt"
-        save_test_case(filename, n_vertices, edges)
-        print(f"\nGenerated: ./tests/{filename}")
-        print(f"  Vertices: {n_vertices}, Edges: {len(edges)}, k-factor: {k_factor}")
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Generate sparse k-factor benchmark tests for main.cpp."
+    )
+    parser.add_argument(
+        "--cases-per-group",
+        type=int,
+        default=DEFAULT_CASES_PER_GROUP,
+        help="number of graphs for each k/n group",
+    )
+    parser.add_argument(
+        "--vertices",
+        default=",".join(str(n) for n in DEFAULT_VERTEX_COUNTS),
+        help="comma-separated vertex counts to generate",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=DEFAULT_SEED,
+        help="random seed for reproducible test files",
+    )
+    parser.add_argument(
+        "--keep-existing",
+        action="store_true",
+        help="do not delete existing tests/test_case_*.txt files before generating",
+    )
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    vertex_counts = parse_vertex_counts(args.vertices)
+
+    if args.cases_per_group <= 0:
+        raise ValueError("--cases-per-group must be positive")
+
+    rng = random.Random(args.seed)
+
+    removed = 0
+    if not args.keep_existing:
+        removed = clean_generated_tests(TESTS_DIR)
+
+    generated: list[TestCase] = []
+    case_number = 1
+    for n_vertices in vertex_counts:
+        for k_factor in DEFAULT_K_FACTORS:
+            for _ in range(args.cases_per_group):
+                test_case = generate_test_case(n_vertices, k_factor, case_number, rng)
+                save_test_case(test_case, TESTS_DIR)
+                generated.append(test_case)
+                case_number += 1
+
+    print("Generated sparse k-factor benchmark tests")
+    print(f"  Directory: {TESTS_DIR}")
+    print(f"  Removed old generated tests: {removed}")
+    print(f"  Seed: {args.seed}")
+    print(f"  Cases per k/n group: {args.cases_per_group}")
+    print(f"  Vertex counts: {', '.join(str(n) for n in vertex_counts)}")
+    print(f"  Total generated: {len(generated)}")
+
+    for k_factor in DEFAULT_K_FACTORS:
+        for n_vertices in vertex_counts:
+            group = [
+                test_case
+                for test_case in generated
+                if test_case.k_factor == k_factor and test_case.n_vertices == n_vertices
+            ]
+            edge_counts = [len(test_case.edges) for test_case in group]
+            print(
+                f"  k={k_factor}, n={n_vertices}: "
+                f"{len(group)} files, edges {min(edge_counts)}-{max(edge_counts)}"
+            )
 
 
 if __name__ == "__main__":
