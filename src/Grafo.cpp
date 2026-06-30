@@ -77,7 +77,7 @@ int Grafo::buscaBinariaAlterada(vector<int> vetorOrdenado, int valor) const
     return indice_retorno;
 }
 
-bool Grafo::verticePertenceOuter(int vertice)
+bool Grafo::verticeInfladoPertenceOuter(int vertice)
 {
     // encontra vértice do grafo original originou este vertice no gadget
     int verticeOriginal = buscaBinariaAlterada(indicesIniciais, vertice);
@@ -138,6 +138,9 @@ void Grafo::adicionaAresta(const int u, const int v)
 {
     if (u < 0 || v < 0 || u >= numeroVertices || v >= numeroVertices)
         throw "Erro: vértice nao existe.";
+
+    if (u == v)
+        throw "Erro: self-loop não suportado";
 
     if (matrizAdjacencias[u][v])
         return;
@@ -310,7 +313,7 @@ string Grafo::toStringFator() const
     {
         int grau = listaAdjacencias[i].size();
         grausFator[i] = grau;
-        if (grau > 0 && grau < menorGrauFator)
+        if (grau < menorGrauFator)
         {
             menorGrauFator = grau;
         }
