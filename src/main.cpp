@@ -53,11 +53,14 @@ Grafo achaKFatorSimples(Grafo &grafo, const int k)
     for (list<int>::iterator it = arestasEmparelhamento.begin(); it != arestasEmparelhamento.end(); it++)
     {
         pair<int, int> e = Adapter.GetEdge(*it);
-        if (g_linha.verticePertenceOuter(e.first))
+        if (grafo.verticeInfladoPertenceOuter(e.first) &&
+            grafo.verticeInfladoPertenceOuter(e.second))
         {
             int verticeOrigem = grafo.getVerticeOriginal(e.first);
             int verticeDestino = grafo.getVerticeOriginal(e.second);
-            F.adicionaAresta(verticeOrigem, verticeDestino);
+
+            if (verticeOrigem != verticeDestino)
+                F.adicionaAresta(verticeOrigem, verticeDestino);
         }
     }
     // retorne F
