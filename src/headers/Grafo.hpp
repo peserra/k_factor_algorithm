@@ -50,7 +50,7 @@ public:
     // 'infla' o grafo, seguindo o algoritmo.
     Grafo criaGrafoInflado(const int k);
 
-    bool verticePertenceOuter(int vertice);
+    bool verticeInfladoPertenceOuter(int vertice);
 
     int getVerticeOriginal(int verticeGadget) const;
 
